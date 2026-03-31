@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
@@ -17,130 +18,118 @@ import { ContactForm } from "@/components/contact-form";
 import HeroScene from "@/components/hero-scene";
 import { Reveal } from "@/components/reveal";
 
-const signatureSystems = [
+const featuredProjects = [
   {
-    title: "Launch Trailer Hero",
+    title: "Atlas AI Desk",
     description:
-      "A cinematic first fold with a live 3D scene, layered copy, and motion-driven CTA hierarchy.",
+      "An AI-powered study workspace for notes, summaries, topic search, and sprint planning built for students who live inside deadlines.",
     icon: Orbit,
-    bullets: [
-      "React Three Fiber scene",
-      "Scroll-stopping visual depth",
-      "Recruiter-friendly narrative hook",
-    ],
+    bullets: ["Next.js + Python stack", "Semantic note search", "Planner + revision dashboard"],
   },
   {
-    title: "Proof of Range",
+    title: "CampusSync OS",
     description:
-      "Premium cards and capability blocks that sell engineering depth, product thinking, and frontend craft fast.",
+      "A full-stack platform for college clubs and events with role-based dashboards, notices, applications, and live engagement tracking.",
     icon: Layers3,
-    bullets: [
-      "System design storytelling",
-      "High-signal content layout",
-      "Glassmorphism with restraint",
-    ],
+    bullets: ["Role-based auth", "PostgreSQL-backed workflows", "Admin + student interfaces"],
   },
   {
-    title: "Conversion Layer",
+    title: "VisionMark",
     description:
-      "A real API-backed contact flow with validation and live project intelligence so the site behaves like a product.",
+      "A computer-vision attendance system with analytics, profile tracking, and clean reporting for faculty and student coordinators.",
     icon: Workflow,
-    bullets: [
-      "Next.js Route Handler",
-      "Zod schema validation",
-      "Client-side live qualification",
-    ],
+    bullets: ["OpenCV + Flask pipeline", "Dashboard analytics", "Attendance reliability layer"],
   },
 ] as const;
 
-const proofSignals = [
+const standoutSignals = [
   {
-    title: "Visual Authority",
-    copy: "The UI feels deliberate, modern, and premium instead of another safe template clone.",
+    title: "Hackathon Energy",
+    copy: "I like shipping fast, presenting clearly, and turning rough ideas into demos that feel polished enough to be real products.",
     icon: Sparkles,
   },
   {
-    title: "Engineering Depth",
-    copy: "App Router, typed APIs, and interaction systems show that this is more than surface-level styling.",
+    title: "CS Foundations",
+    copy: "DSA, OOP, DBMS, OS, and computer networks are not buzzwords for me, they shape how I think through systems.",
     icon: Braces,
   },
   {
-    title: "Product Sense",
-    copy: "Each section answers a business question: who you are, what you build, and why someone should hire you.",
+    title: "UI Obsession",
+    copy: "I care about motion, hierarchy, and detail so the frontend feels memorable instead of just functional.",
     icon: Globe,
   },
   {
-    title: "Trust Layer",
-    copy: "The contact section adds structure, validation, and responsiveness that feels deployment-ready.",
+    title: "Ownership Mindset",
+    copy: "Whether it is a college build, freelance sprint, or internship task, I like picking up the full problem and carrying it through.",
     icon: ShieldCheck,
   },
 ] as const;
 
 const stackGroups = [
   {
-    title: "Frontend Motion Stack",
+    title: "CS Core + Languages",
+    icon: Braces,
+    items: [
+      "C++, Java, Python, TypeScript",
+      "Data Structures and Algorithms",
+      "OOP, DBMS, OS, Computer Networks",
+      "Problem solving with product thinking",
+    ],
+  },
+  {
+    title: "Frontend + Experience",
     icon: Sparkles,
     items: [
-      "Next.js 16 App Router",
-      "React 19 component architecture",
-      "Framer Motion reveals",
-      "Tailwind CSS v4 styling system",
+      "Next.js, React, Tailwind CSS",
+      "Framer Motion and 3D interactions",
+      "Responsive UI systems",
+      "Design-heavy landing and portfolio builds",
     ],
   },
   {
-    title: "3D Experience Layer",
-    icon: Orbit,
-    items: [
-      "Three.js rendering",
-      "React Three Fiber scene control",
-      "Drei helpers and materials",
-      "Pointer-reactive animation loops",
-    ],
-  },
-  {
-    title: "Backend and Validation",
+    title: "Backend + Data",
     icon: Database,
     items: [
-      "Route Handlers in the app directory",
-      "Shared Zod validation schema",
-      "Client + server form feedback",
-      "Full-stack structure ready for email/CRM integration",
+      "Node.js, Express, REST APIs",
+      "MongoDB, PostgreSQL, Supabase",
+      "Auth, dashboards, validation layers",
+      "Python services and CV/AI experiments",
     ],
   },
 ] as const;
 
-const deliveryFlow = [
+const journeyFlow = [
   {
     step: "01",
-    title: "Positioning",
-    copy: "We frame the portfolio around your strongest edge: frontend, full stack, AI, product, or founder-led storytelling.",
+    title: "Foundation Mode",
+    copy: "Started with core CS, logic building, and the habit of understanding how things work under the hood.",
   },
   {
     step: "02",
-    title: "Visual System",
-    copy: "We translate that positioning into a bold design language with depth, motion, hierarchy, and signature moments.",
+    title: "Build Mode",
+    copy: "Moved into full-stack projects, student products, hackathons, and interfaces that feel more alive than usual college work.",
   },
   {
     step: "03",
-    title: "Interaction Build",
-    copy: "The UI gets 3D scenes, responsive layouts, and conversion surfaces that feel premium on desktop and mobile.",
+    title: "Experiment Mode",
+    copy: "Exploring AI workflows, computer vision, and interaction-heavy web experiences that blend engineering with design taste.",
   },
   {
     step: "04",
-    title: "Ship Ready",
-    copy: "The final result is a real product shell, not just a mockup: typed, responsive, and easy to extend.",
+    title: "Career Mode",
+    copy: "Now focused on internships, real teams, and harder product problems where I can contribute fast and level up faster.",
   },
 ] as const;
 
 const technologyStrip = [
-  "Next.js 16",
-  "React 19",
-  "TypeScript",
-  "Tailwind v4",
-  "Framer Motion",
-  "React Three Fiber",
-  "Drei",
-  "Zod",
+  "BTech CSE '27",
+  "C++",
+  "Java",
+  "Python",
+  "Next.js",
+  "React",
+  "Node.js",
+  "MongoDB",
 ] as const;
 
 function SectionHeading({
@@ -170,17 +159,17 @@ export default function Home() {
     <div className="relative isolate overflow-x-clip">
       <header className="sticky top-0 z-40 border-b border-white/8 bg-[rgba(5,8,22,0.72)] backdrop-blur-xl">
         <div className="section-shell flex items-center justify-between gap-4 py-4">
-          <Link href="#hero" className="font-display text-lg tracking-[0.24em] text-white">
-            NEXUS//PORTFOLIO
+          <Link href="#hero" className="font-display text-lg tracking-[0.22em] text-white">
+            AARAV//GRAVITY
           </Link>
           <nav className="hidden items-center gap-6 text-sm text-[var(--muted)] md:flex">
-            <Link href="#signature">Signature</Link>
-            <Link href="#impact">Proof</Link>
+            <Link href="#projects">Projects</Link>
+            <Link href="#signals">Signals</Link>
             <Link href="#stack">Stack</Link>
-            <Link href="#flow">Flow</Link>
+            <Link href="#journey">Journey</Link>
           </nav>
           <Link href="#contact" className="secondary-button min-h-11 px-4 py-2 text-sm">
-            Book Intro
+            Say Hello
           </Link>
         </div>
       </header>
@@ -190,40 +179,39 @@ export default function Home() {
           <div className="grid gap-8 lg:grid-cols-[1.02fr_0.98fr] lg:items-center lg:gap-10">
             <Reveal className="space-y-8">
               <span className="eyebrow">
-                Creative Full-Stack Engineer / 3D-first web system / Recruiter magnet
+                Aarav Sharma / BTech Computer Science Student / Full-Stack + AI Builder
               </span>
               <div className="space-y-6">
-                <h1 className="hero-title max-w-4xl text-white">
-                  Cinematic interfaces.
+                <h1 className="hero-title max-w-5xl text-white">
+                  Anti-gravity style interfaces.
                   <br />
-                  Real engineering depth.
+                  CS-backed engineering.
                   <br />
-                  One-scroll impact.
+                  Student hustle, pro execution.
                 </h1>
                 <p className="max-w-2xl text-lg leading-8 text-[var(--muted)] md:text-xl">
-                  This portfolio is built to make founders, clients, and hiring teams stop
-                  scrolling. It combines high-end 3D visuals, polished motion, and a real
-                  full-stack contact system so the experience feels expensive and the codebase
-                  stays serious.
+                  I&apos;m a BTech CSE student who likes turning ideas from labs, hackathons, and
+                  late-night coding sessions into polished full-stack products. My sweet spot is
+                  modern frontend systems, backend logic, and UI that makes people stop scrolling.
                 </p>
               </div>
 
               <div className="flex flex-col gap-4 sm:flex-row">
-                <Link href="#contact" className="primary-button">
-                  Build My Portfolio
+                <Link href="#projects" className="primary-button">
+                  View Featured Builds
                   <ArrowRight className="size-4" />
                 </Link>
-                <Link href="#signature" className="secondary-button">
-                  Explore The System
+                <Link href="#journey" className="secondary-button">
+                  Explore My Journey
                   <ArrowUpRight className="size-4" />
                 </Link>
               </div>
 
               <div className="grid gap-4 sm:grid-cols-3">
                 {[
-                  { value: "3D", label: "immersive first impression" },
-                  { value: "API", label: "live contact qualification" },
-                  { value: "60fps", label: "motion-first target feel" },
+                  { value: "12+", label: "projects and prototypes shipped" },
+                  { value: "350+", label: "DSA and problem-solving reps" },
+                  { value: "3x", label: "hackathon and sprint build mindset" },
                 ].map((item) => (
                   <div key={item.label} className="glass-panel p-5">
                     <p className="font-display text-4xl tracking-[-0.05em] text-white">
@@ -240,29 +228,53 @@ export default function Home() {
             <Reveal delay={0.08}>
               <div className="scene-frame overflow-hidden p-4 md:p-6">
                 <div className="surface-line absolute left-4 right-4 top-4 z-10 flex flex-wrap items-center justify-between gap-3 rounded-full px-4 py-3 text-xs uppercase tracking-[0.22em] text-[var(--muted)] md:left-6 md:right-6 md:top-6">
-                  <span>Recruiter-grade storytelling</span>
-                  <span>Desktop + mobile ready</span>
+                  <span>BTech CSE &apos;27 / India based</span>
+                  <span>Open to internships + serious collabs</span>
                 </div>
 
                 <HeroScene />
 
+                <div className="absolute right-4 top-20 z-10 w-[220px] sm:w-[250px] md:right-6 md:top-24 md:w-[296px]">
+                  <div className="glass-panel p-3">
+                    <div className="overflow-hidden rounded-[1.6rem]">
+                      <Image
+                        src="/profile-student.jpeg"
+                        alt="Aarav Sharma working on a laptop"
+                        width={592}
+                        height={888}
+                        priority
+                        className="h-auto w-full object-cover"
+                      />
+                    </div>
+                    <div className="px-2 pb-2 pt-4">
+                      <p className="font-display text-3xl tracking-[-0.05em] text-white">
+                        Aarav Sharma
+                      </p>
+                      <p className="mt-2 text-sm leading-6 text-[var(--muted)]">
+                        CS undergrad building premium web products, AI-side tools, and frontends
+                        that feel heavier than templates.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
                 <div className="absolute bottom-4 left-4 right-4 z-10 grid gap-3 md:bottom-6 md:left-6 md:right-6 md:grid-cols-2">
                   <div className="surface-line rounded-3xl p-4">
                     <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                      Experience layer
+                      Current focus
                     </p>
                     <p className="mt-2 text-sm leading-7 text-white/90">
-                      Scroll-safe depth, pointer-reactive motion, and structured copy that feels
-                      like a premium launch page.
+                      Internship-ready full-stack products, 3D interfaces, and student tools with
+                      real backend depth.
                     </p>
                   </div>
                   <div className="surface-line rounded-3xl p-4">
                     <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                      Technology spine
+                      Build style
                     </p>
                     <p className="mt-2 text-sm leading-7 text-white/90">
-                      App Router, React 19, Three.js, Framer Motion, and typed validation woven
-                      into one clean build.
+                      Sharp UI taste, CS fundamentals, fast iteration, and the habit of carrying
+                      ideas all the way to something usable.
                     </p>
                   </div>
                 </div>
@@ -282,15 +294,15 @@ export default function Home() {
           </Reveal>
         </section>
 
-        <section id="signature" className="section-shell py-14 md:py-20">
+        <section id="projects" className="section-shell py-14 md:py-20">
           <SectionHeading
-            eyebrow="Signature Sections"
-            title="Everything that makes the site feel elite is intentional."
-            description="The layout is split into distinct systems so your portfolio sells taste, depth, and technical range in the first few scrolls."
+            eyebrow="Featured Builds"
+            title="Projects that feel sharper than typical student portfolios."
+            description="These are the kind of systems I like building: product-minded, full-stack, and visually strong enough to stand out in a crowded shortlist."
           />
 
           <div className="grid gap-6 lg:grid-cols-3">
-            {signatureSystems.map(({ title, description, icon: Icon, bullets }, index) => (
+            {featuredProjects.map(({ title, description, icon: Icon, bullets }, index) => (
               <Reveal key={title} delay={index * 0.06}>
                 <article className="glass-panel h-full p-7">
                   <div className="flex items-center justify-between gap-4">
@@ -318,27 +330,27 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="impact" className="section-shell py-14 md:py-20">
+        <section id="signals" className="section-shell py-14 md:py-20">
           <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <Reveal className="glass-panel p-8 md:p-10">
-              <span className="eyebrow">Proof Layer</span>
+              <span className="eyebrow">Why Me</span>
               <h2 className="mt-5 font-display text-4xl leading-tight tracking-[-0.04em] text-white md:text-5xl">
-                This portfolio is designed to say
+                More than a student portfolio.
                 <br />
-                &ldquo;not another generic candidate.&rdquo;
+                It reads like a builder profile.
               </h2>
               <p className="mt-5 max-w-xl text-base leading-8 text-[var(--muted)] md:text-lg">
-                It positions you as someone who can think like a designer, build like an engineer,
-                and present work like a product team. The visuals grab attention, but the structure
-                underneath is what keeps people reading.
+                I wanted this site to show range fast: CS fundamentals, product instinct, clean
+                execution, and the kind of visual ambition that instantly separates me from a basic
+                resume page.
               </p>
 
               <div className="mt-8 grid gap-4 sm:grid-cols-2">
                 {[
-                  { label: "Design taste", value: "Premium" },
-                  { label: "Technical credibility", value: "Typed" },
-                  { label: "Motion quality", value: "Intentional" },
-                  { label: "Conversion readiness", value: "Built-in" },
+                  { label: "Focus areas", value: "AI + Full Stack" },
+                  { label: "Preferred roles", value: "Intern / Builder" },
+                  { label: "Strength zone", value: "Frontend + Systems" },
+                  { label: "Energy level", value: "Hackathon Fast" },
                 ].map((item) => (
                   <div key={item.label} className="surface-line rounded-3xl p-4">
                     <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
@@ -353,7 +365,7 @@ export default function Home() {
             </Reveal>
 
             <div className="grid gap-4 sm:grid-cols-2">
-              {proofSignals.map(({ title, copy, icon: Icon }, index) => (
+              {standoutSignals.map(({ title, copy, icon: Icon }, index) => (
                 <Reveal key={title} delay={0.04 * index}>
                   <article className="glass-panel h-full p-6">
                     <span className="inline-flex rounded-2xl border border-white/10 bg-white/6 p-3">
@@ -372,9 +384,9 @@ export default function Home() {
 
         <section id="stack" className="section-shell py-14 md:py-20">
           <SectionHeading
-            eyebrow="Stack Arsenal"
-            title="Modern tools, but used with actual intent."
-            description="The tech stack is current, but the bigger point is how the pieces work together: fast rendering, clean interactivity, immersive visuals, and extendable backend hooks."
+            eyebrow="Stack + CS Core"
+            title="The toolkit is modern, but the thinking is grounded."
+            description="I care about current tools, but I also care about how systems are modeled, where data flows, how interfaces feel, and whether the product can scale past demo mode."
           />
 
           <div className="grid gap-6 lg:grid-cols-3">
@@ -407,15 +419,15 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="flow" className="section-shell py-14 md:py-20">
+        <section id="journey" className="section-shell py-14 md:py-20">
           <SectionHeading
-            eyebrow="Build Flow"
-            title="The portfolio is packaged like a product, not a one-off page."
-            description="A strong site needs more than flashy visuals. The process below keeps the message sharp, the interface cohesive, and the technical base easy to keep growing."
+            eyebrow="Journey Mode"
+            title="From CS classroom curiosity to product-builder momentum."
+            description="The path is simple: learn hard concepts properly, ship visible work, keep raising quality, and be ready when strong opportunities show up."
           />
 
           <div className="grid gap-4 lg:grid-cols-4">
-            {deliveryFlow.map(({ step, title, copy }, index) => (
+            {journeyFlow.map(({ step, title, copy }, index) => (
               <Reveal key={step} delay={index * 0.05}>
                 <article className="glass-panel h-full p-6">
                   <p className="font-mono text-xs uppercase tracking-[0.25em] text-[var(--accent)]">
@@ -435,29 +447,31 @@ export default function Home() {
           <Reveal className="glass-panel p-6 md:p-10">
             <div className="mb-8 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
               <div className="max-w-2xl space-y-4">
-                <span className="eyebrow">Contact System</span>
+                <span className="eyebrow">Contact Layer</span>
                 <h2 className="font-display text-4xl leading-tight tracking-[-0.04em] text-white md:text-5xl">
-                  Close with something that feels as polished as the hero.
+                  If you have an internship, product sprint, or crazy build idea, I&apos;m in.
                 </h2>
                 <p className="text-base leading-8 text-[var(--muted)] md:text-lg">
-                  The form below includes shared validation, API feedback, and a live project
-                  signal panel so even your inquiry flow feels premium.
+                  Recruiters, startup teams, hackathon squads, and collaborators can drop a note
+                  here. The form is wired like a real product touchpoint, not a dead-end section.
                 </p>
               </div>
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="surface-line rounded-3xl px-5 py-4">
                   <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                    Response window
+                    Open to
                   </p>
-                  <p className="mt-2 text-base font-semibold text-white">Within 24 hours</p>
+                  <p className="mt-2 text-base font-semibold text-white">
+                    Internships, hackathons, freelance prototypes
+                  </p>
                 </div>
                 <div className="surface-line rounded-3xl px-5 py-4">
                   <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                    Ideal projects
+                    Current vibe
                   </p>
                   <p className="mt-2 text-base font-semibold text-white">
-                    3D showcases, SaaS, founder portfolios
+                    Shipping, learning, and saying yes to hard builds
                   </p>
                 </div>
               </div>
@@ -470,11 +484,11 @@ export default function Home() {
 
       <footer className="section-shell pb-8 pt-2">
         <div className="flex flex-col gap-4 border-t border-white/10 py-6 text-sm text-[var(--muted)] md:flex-row md:items-center md:justify-between">
-          <p>Built to make a random HR, founder, or client pause and keep looking.</p>
+          <p>Built to make recruiters, founders, and random HR people stop and actually remember me.</p>
           <div className="flex flex-wrap gap-3">
-            <span className="pill-chip text-sm">3D-first</span>
-            <span className="pill-chip text-sm">Full-stack ready</span>
-            <span className="pill-chip text-sm">High-signal UI</span>
+            <span className="pill-chip text-sm">BTech CSE</span>
+            <span className="pill-chip text-sm">3D-heavy UI</span>
+            <span className="pill-chip text-sm">Internship-ready</span>
           </div>
         </div>
       </footer>

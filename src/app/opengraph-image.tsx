@@ -5,7 +5,7 @@ export const size = {
   height: 630,
 };
 
-export const alt = "Cinematic Portfolio";
+export const alt = "Aarav Sharma | CS BTech Portfolio";
 export const contentType = "image/png";
 
 export default function OpenGraphImage() {
@@ -38,7 +38,7 @@ export default function OpenGraphImage() {
             textTransform: "uppercase",
           }}
         >
-          NEXUS//PORTFOLIO
+          AARAV//GRAVITY
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -53,7 +53,7 @@ export default function OpenGraphImage() {
             }}
           >
             <span>Cinematic interfaces.</span>
-            <span>Real engineering depth.</span>
+            <span>CS-backed builder energy.</span>
           </div>
           <p
             style={{
@@ -64,8 +64,8 @@ export default function OpenGraphImage() {
               lineHeight: 1.4,
             }}
           >
-            3D-first Next.js portfolio with premium motion, strong visual hierarchy, and
-            a full-stack contact layer.
+            BTech CSE portfolio with anti-gravity visuals, full-stack projects, and a
+            student-builder profile that still feels premium.
           </p>
         </div>
 
@@ -77,11 +77,11 @@ export default function OpenGraphImage() {
             color: "#f5efe6",
           }}
         >
-          <span>Next.js 16</span>
-          <span>React 19</span>
+          <span>BTech CSE</span>
+          <span>Next.js</span>
+          <span>AI Builds</span>
           <span>R3F</span>
-          <span>Framer Motion</span>
-          <span>Zod</span>
+          <span>Full Stack</span>
         </div>
       </div>
     ),

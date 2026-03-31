@@ -1,38 +1,37 @@
 import { NextResponse } from "next/server";
 import { contactSchema } from "@/lib/contact-schema";
 
-function deriveProjectSignals(message: string, projectType: string) {
-  const normalized = `${projectType} ${message}`.toLowerCase();
+function deriveOpportunitySignals(message: string, opportunityType: string) {
+  const normalized = `${opportunityType} ${message}`.toLowerCase();
 
-  const focusMap = [
+  const signalMap = [
     {
-      label: "3D storytelling",
-      active: /3d|three|webgl|scroll|motion|immersive|hero/.test(normalized),
-      stack: ["React Three Fiber", "Drei", "Framer Motion"],
+      label: "Frontend-heavy role",
+      active: /frontend|ui|ux|landing|design|react|next/.test(normalized),
+      stack: ["Next.js", "React", "Tailwind CSS"],
     },
     {
-      label: "SaaS product framing",
-      active: /dashboard|saas|product|platform|workflow|b2b/.test(normalized),
-      stack: ["Route Handlers", "Server Components"],
+      label: "Full-stack build",
+      active: /full-stack|backend|api|dashboard|auth|database|product/.test(normalized),
+      stack: ["Node.js", "APIs", "Database Design"],
     },
     {
-      label: "Conversion architecture",
-      active: /cta|lead|funnel|sales|inquiry|convert/.test(normalized),
-      stack: ["Contact Pipeline", "Zod Validation"],
+      label: "AI or CV angle",
+      active: /ai|llm|ml|vision|opencv|automation|agent/.test(normalized),
+      stack: ["Python", "AI Workflows", "Experimentation"],
     },
     {
-      label: "Narrative-first branding",
-      active: /brand|story|launch|positioning|visual/.test(normalized),
-      stack: ["Content Strategy", "Motion Systems"],
+      label: "Fast-collab sprint",
+      active: /hackathon|sprint|prototype|ship|mvp/.test(normalized),
+      stack: ["Rapid Prototyping", "Ownership", "Presentation Ready UI"],
     },
   ];
 
-  const matched = focusMap.filter((item) => item.active);
+  const matched = signalMap.filter((item) => item.active);
   const recommendedStack = Array.from(
     new Set([
-      "Next.js App Router",
-      "TypeScript",
-      "Tailwind CSS v4",
+      "Communication",
+      "Execution",
       ...matched.flatMap((item) => item.stack),
     ]),
   );
@@ -57,9 +56,9 @@ export async function POST(request: Request) {
     );
   }
 
-  const { name, message, projectType } = parsed.data;
-  const leadId = `NEX-${Date.now().toString(36).toUpperCase()}`;
-  const signals = deriveProjectSignals(message, projectType);
+  const { name, message, opportunityType, timeline } = parsed.data;
+  const leadId = `AAR-${Date.now().toString(36).toUpperCase()}`;
+  const signals = deriveOpportunitySignals(message, opportunityType);
 
   await new Promise((resolve) => setTimeout(resolve, 900));
 
@@ -67,7 +66,7 @@ export async function POST(request: Request) {
     success: true,
     leadId,
     responseWindow: "Within 24 hours",
-    summary: `${name}, your request has been queued with a ${projectType.toLowerCase()} focus and a premium build path.`,
+    summary: `${name}, your ${opportunityType.toLowerCase()} note is queued for a ${timeline.toLowerCase()} window.`,
     ...signals,
   });
 }

@@ -6,29 +6,29 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "Cinematic Portfolio | Creative Full-Stack Engineer",
-    template: "%s | Cinematic Portfolio",
+    default: "Aarav Sharma | CS BTech Portfolio",
+    template: "%s | Aarav Sharma",
   },
   description:
-    "A premium 3D-first portfolio built with Next.js, React 19, motion systems, and a polished contact pipeline.",
+    "A premium 3D-first portfolio for a CS BTech student focused on full-stack products, AI experiments, and standout frontend execution.",
   keywords: [
-    "Next.js portfolio",
+    "CS student portfolio",
+    "BTech portfolio",
+    "Next.js student portfolio",
     "3D portfolio",
-    "creative developer",
-    "full-stack engineer",
-    "React Three Fiber",
+    "full-stack student developer",
   ],
   openGraph: {
-    title: "Cinematic Portfolio",
+    title: "Aarav Sharma | CS BTech Portfolio",
     description:
-      "Creative full-stack engineering with immersive 3D visuals and premium product storytelling.",
+      "CS BTech student portfolio with immersive 3D visuals, strong product thinking, and full-stack project depth.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Cinematic Portfolio",
+    title: "Aarav Sharma | CS BTech Portfolio",
     description:
-      "Creative full-stack engineering with immersive 3D visuals and premium product storytelling.",
+      "CS BTech student portfolio with immersive 3D visuals, strong product thinking, and full-stack project depth.",
   },
 };
 

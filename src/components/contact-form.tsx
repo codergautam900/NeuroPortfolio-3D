@@ -3,9 +3,9 @@
 import { useDeferredValue, useState, useTransition } from "react";
 import { ArrowRight, LoaderCircle, Send, ShieldCheck, Sparkles } from "lucide-react";
 import {
-  budgetBands,
   contactSchema,
-  projectTypes,
+  opportunityTypes,
+  timelineOptions,
   type ContactPayload,
 } from "@/lib/contact-schema";
 
@@ -23,8 +23,8 @@ const defaultForm: ContactPayload = {
   name: "",
   email: "",
   company: "",
-  projectType: projectTypes[0],
-  budget: budgetBands[1],
+  opportunityType: opportunityTypes[0],
+  timeline: timelineOptions[0],
   message: "",
 };
 
@@ -36,55 +36,54 @@ function flattenErrors(fieldErrors: Record<string, string[] | undefined>) {
 
 function deriveLiveSignal(
   message: string,
-  projectType: string,
-  budget: string,
+  opportunityType: string,
+  timeline: string,
 ): {
   score: number;
   lane: string;
   notes: string[];
   recommendedStack: string[];
 } {
-  const normalized = `${projectType} ${message}`.toLowerCase();
-  const has3D = /3d|three|motion|scroll|immersive|webgl|hero/.test(normalized);
-  const hasProduct = /saas|dashboard|product|platform|workflow|app/.test(normalized);
-  const hasBrand = /brand|visual|identity|story|launch|positioning/.test(normalized);
-  const hasConversion = /lead|funnel|pricing|cta|book|convert|inquiry/.test(normalized);
+  const normalized = `${opportunityType} ${message}`.toLowerCase();
+  const hasFrontend = /frontend|ui|ux|landing|react|next|design/.test(normalized);
+  const hasBackend = /backend|api|auth|database|dashboard|full-stack/.test(normalized);
+  const hasAI = /ai|llm|ml|vision|opencv|automation|agent/.test(normalized);
+  const hasSprint = /hackathon|sprint|prototype|mvp|ship/.test(normalized);
 
   const score =
-    68 +
-    (has3D ? 10 : 0) +
-    (hasProduct ? 7 : 0) +
-    (hasBrand ? 6 : 0) +
-    (hasConversion ? 5 : 0) +
-    (budget === budgetBands[2] ? 4 : 0);
+    70 +
+    (hasFrontend ? 7 : 0) +
+    (hasBackend ? 7 : 0) +
+    (hasAI ? 8 : 0) +
+    (hasSprint ? 5 : 0) +
+    (timeline === timelineOptions[0] ? 3 : 0);
 
-  const lane = has3D
-    ? "Immersive flagship build"
-    : hasProduct
-      ? "Product-led portfolio system"
-      : "Narrative-first personal brand";
+  const lane = hasAI
+    ? "AI + full-stack lane"
+    : hasBackend
+      ? "Product engineering lane"
+      : hasFrontend
+        ? "Frontend-first lane"
+        : "Builder collaboration lane";
 
   const notes = [
-    has3D ? "3D interaction moments detected" : "Keep one signature motion moment in the first fold",
-    hasProduct
-      ? "Strong product language suggests dashboard or SaaS proof sections"
-      : "Consider adding one product architecture block for credibility",
-    hasConversion
-      ? "Lead capture intent is clear and worth keeping prominent"
-      : "A clear CTA stack will make the portfolio convert harder",
+    hasFrontend
+      ? "Strong frontend signal detected"
+      : "The message can highlight UI, UX, or web-product goals more clearly",
+    hasBackend
+      ? "Looks like a role with backend ownership or product logic"
+      : "If there is API or data work involved, mention it to sharpen the fit",
+    hasSprint
+      ? "Fast delivery energy is clear, good sign for hackathons or prototypes"
+      : "If speed matters, mention delivery expectations or the sprint timeline",
   ];
 
   const recommendedStack = [
-    "Next.js 16",
-    "React 19",
-    has3D ? "React Three Fiber" : "Framer Motion",
-    hasProduct ? "Route Handlers" : "Server Components",
-    "Zod Validation",
+    "Problem Solving",
+    hasFrontend ? "Next.js + React" : "Frontend Systems",
+    hasBackend ? "Backend + Databases" : "Typed APIs",
+    hasAI ? "Python + AI Experiments" : "Product Thinking",
   ];
-
-  if (hasBrand) {
-    recommendedStack.push("Narrative Content System");
-  }
 
   return {
     score: Math.min(score, 98),
@@ -99,7 +98,7 @@ export function ContactForm() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [submitState, setSubmitState] = useState<SubmitState>({
     status: "idle",
-    message: "Share your vision and the system will suggest the strongest build lane.",
+    message: "Share the role, internship, sprint, or collaboration idea and the system will map the fit.",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [, startTransition] = useTransition();
@@ -107,8 +106,8 @@ export function ContactForm() {
   const deferredMessage = useDeferredValue(form.message);
   const liveSignal = deriveLiveSignal(
     deferredMessage,
-    form.projectType,
-    form.budget,
+    form.opportunityType,
+    form.timeline,
   );
 
   function updateField<Key extends keyof ContactPayload>(
@@ -232,7 +231,7 @@ export function ContactForm() {
 
         <div className="grid gap-5 md:grid-cols-3">
           <label className="space-y-2 md:col-span-1">
-            <span className="text-sm font-semibold text-white">Company</span>
+            <span className="text-sm font-semibold text-white">Organization</span>
             <input
               value={form.company}
               onChange={(event) => updateField("company", event.target.value)}
@@ -245,56 +244,58 @@ export function ContactForm() {
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-white">Project Type</span>
+            <span className="text-sm font-semibold text-white">Opportunity Type</span>
             <select
-              value={form.projectType}
+              value={form.opportunityType}
               onChange={(event) =>
                 updateField(
-                  "projectType",
-                  event.target.value as (typeof projectTypes)[number],
+                  "opportunityType",
+                  event.target.value as (typeof opportunityTypes)[number],
                 )
               }
               className="field-select"
             >
-              {projectTypes.map((item) => (
+              {opportunityTypes.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
               ))}
             </select>
-            {fieldErrors.projectType ? (
-              <span className="text-sm text-orange-300">{fieldErrors.projectType}</span>
+            {fieldErrors.opportunityType ? (
+              <span className="text-sm text-orange-300">
+                {fieldErrors.opportunityType}
+              </span>
             ) : null}
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-white">Budget</span>
+            <span className="text-sm font-semibold text-white">Timeline</span>
             <select
-              value={form.budget}
+              value={form.timeline}
               onChange={(event) =>
-                updateField("budget", event.target.value as (typeof budgetBands)[number])
+                updateField("timeline", event.target.value as (typeof timelineOptions)[number])
               }
               className="field-select"
             >
-              {budgetBands.map((item) => (
+              {timelineOptions.map((item) => (
                 <option key={item} value={item}>
                   {item}
                 </option>
               ))}
             </select>
-            {fieldErrors.budget ? (
-              <span className="text-sm text-orange-300">{fieldErrors.budget}</span>
+            {fieldErrors.timeline ? (
+              <span className="text-sm text-orange-300">{fieldErrors.timeline}</span>
             ) : null}
           </label>
         </div>
 
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-white">Project Vision</span>
+          <span className="text-sm font-semibold text-white">Message</span>
           <textarea
             value={form.message}
             onChange={(event) => updateField("message", event.target.value)}
             className="field-textarea"
-            placeholder="Tell me what kind of portfolio or product experience you want to build, what vibe it should have, and what outcome matters most."
+            placeholder="Tell me about the role, team, sprint, or product idea and what kind of contribution you expect."
           />
           {fieldErrors.message ? (
             <span className="text-sm text-orange-300">{fieldErrors.message}</span>
@@ -313,7 +314,7 @@ export function ContactForm() {
             </>
           ) : (
             <>
-              Send Project Brief
+              Send Opportunity
               <ArrowRight className="size-4" />
             </>
           )}
@@ -325,7 +326,7 @@ export function ContactForm() {
           <div className="flex items-center justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                Live project signal
+                Opportunity signal
               </p>
               <h3 className="mt-2 font-display text-3xl tracking-[-0.04em] text-white">
                 {liveSignal.lane}
@@ -372,10 +373,10 @@ export function ContactForm() {
             </span>
             <div>
               <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                Contact pipeline
+                Inbox pipeline
               </p>
               <h3 className="mt-1 font-display text-2xl tracking-[-0.04em] text-white">
-                {submitState.status === "success" ? "Request received" : "Ready to queue"}
+                {submitState.status === "success" ? "Message received" : "Ready to connect"}
               </h3>
             </div>
           </div>
