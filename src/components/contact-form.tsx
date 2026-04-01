@@ -1,414 +1,235 @@
 "use client";
 
-import { useDeferredValue, useState, useTransition } from "react";
-import { ArrowRight, LoaderCircle, Send, ShieldCheck, Sparkles } from "lucide-react";
+import { useActionState, useDeferredValue, useMemo, useState } from "react";
+import { useFormStatus } from "react-dom";
+import { ArrowRight, LoaderCircle, Radar, Sparkles } from "lucide-react";
+import { sendTransmissionAction } from "@/app/actions/transmission";
 import {
-  contactSchema,
-  opportunityTypes,
-  timelineOptions,
-  type ContactPayload,
+  type TransmissionState,
+  transmissionTypes,
+  urgencyBands,
 } from "@/lib/contact-schema";
+import { profile } from "@/lib/neural-content";
 
-type FieldErrors = Partial<Record<keyof ContactPayload, string>>;
-
-type SubmitState = {
-  status: "idle" | "success" | "error";
-  message: string;
-  leadId?: string;
-  responseWindow?: string;
-  recommendedStack?: string[];
+const initialState: TransmissionState = {
+  status: "idle",
+  message:
+    "Send a message for an internship, freelance project, collaboration, or general enquiry.",
 };
 
-const defaultForm: ContactPayload = {
-  name: "",
-  email: "",
-  company: "",
-  opportunityType: opportunityTypes[0],
-  timeline: timelineOptions[0],
-  message: "",
-};
+function SubmitButton() {
+  const { pending } = useFormStatus();
 
-function flattenErrors(fieldErrors: Record<string, string[] | undefined>) {
-  return Object.fromEntries(
-    Object.entries(fieldErrors).map(([key, value]) => [key, value?.[0] ?? ""]),
-  ) as FieldErrors;
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="primary-button w-full disabled:cursor-not-allowed disabled:opacity-75"
+    >
+      {pending ? (
+        <>
+          <LoaderCircle className="size-4 animate-spin" />
+          Sending message
+        </>
+      ) : (
+        <>
+          Send message
+          <ArrowRight className="size-4" />
+        </>
+      )}
+    </button>
+  );
 }
 
-function deriveLiveSignal(
-  message: string,
-  opportunityType: string,
-  timeline: string,
-): {
-  score: number;
-  lane: string;
-  notes: string[];
-  recommendedStack: string[];
-} {
-  const normalized = `${opportunityType} ${message}`.toLowerCase();
-  const hasFrontend = /frontend|ui|ux|landing|react|next|design/.test(normalized);
-  const hasBackend = /backend|api|auth|database|dashboard|full-stack/.test(normalized);
-  const hasAI = /ai|llm|ml|vision|opencv|automation|agent/.test(normalized);
-  const hasSprint = /hackathon|sprint|prototype|mvp|ship/.test(normalized);
-
-  const score =
-    70 +
-    (hasFrontend ? 7 : 0) +
-    (hasBackend ? 7 : 0) +
-    (hasAI ? 8 : 0) +
-    (hasSprint ? 5 : 0) +
-    (timeline === timelineOptions[0] ? 3 : 0);
-
-  const lane = hasAI
-    ? "AI + full-stack lane"
-    : hasBackend
-      ? "Product engineering lane"
-      : hasFrontend
-        ? "Frontend-first lane"
-        : "Builder collaboration lane";
-
-  const notes = [
-    hasFrontend
-      ? "Strong frontend signal detected"
-      : "The message can highlight UI, UX, or web-product goals more clearly",
-    hasBackend
-      ? "Looks like a role with backend ownership or product logic"
-      : "If there is API or data work involved, mention it to sharpen the fit",
-    hasSprint
-      ? "Fast delivery energy is clear, good sign for hackathons or prototypes"
-      : "If speed matters, mention delivery expectations or the sprint timeline",
-  ];
-
-  const recommendedStack = [
-    "Problem Solving",
-    hasFrontend ? "Next.js + React" : "Frontend Systems",
-    hasBackend ? "Backend + Databases" : "Typed APIs",
-    hasAI ? "Python + AI Experiments" : "Product Thinking",
-  ];
-
-  return {
-    score: Math.min(score, 98),
-    lane,
-    notes,
-    recommendedStack: Array.from(new Set(recommendedStack)),
-  };
+function formatFieldError(error?: string) {
+  return error ? <span className="text-sm text-fuchsia-200">{error}</span> : null;
 }
 
 export function ContactForm() {
-  const [form, setForm] = useState<ContactPayload>(defaultForm);
-  const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
-  const [submitState, setSubmitState] = useState<SubmitState>({
-    status: "idle",
-    message: "Share the role, internship, sprint, or collaboration idea and the system will map the fit.",
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [, startTransition] = useTransition();
+  const [state, formAction] = useActionState(sendTransmissionAction, initialState);
+  const [messageDraft, setMessageDraft] = useState("");
+  const messageValue = useDeferredValue(messageDraft);
 
-  const deferredMessage = useDeferredValue(form.message);
-  const liveSignal = deriveLiveSignal(
-    deferredMessage,
-    form.opportunityType,
-    form.timeline,
-  );
+  const liveSignals = useMemo(
+    () => {
+      const lower = messageValue.toLowerCase();
+      const items = [
+        "Full-stack MERN collaboration",
+        "Next.js and TypeScript product work",
+        "Realtime and backend system design",
+        "AI feature and LLM integration support",
+      ];
 
-  function updateField<Key extends keyof ContactPayload>(
-    key: Key,
-    value: ContactPayload[Key],
-  ) {
-    setForm((current) => ({ ...current, [key]: value }));
-    if (fieldErrors[key]) {
-      setFieldErrors((current) => ({ ...current, [key]: "" }));
-    }
-  }
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-
-    const parsed = contactSchema.safeParse(form);
-
-    if (!parsed.success) {
-      setFieldErrors(flattenErrors(parsed.error.flatten().fieldErrors));
-      setSubmitState({
-        status: "error",
-        message: "A few fields need attention before the request can be sent.",
-      });
-      return;
-    }
-
-    setIsSubmitting(true);
-    setFieldErrors({});
-
-    try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(parsed.data),
-      });
-
-      const payload = (await response.json()) as
-        | {
-            error?: string;
-            summary?: string;
-            leadId?: string;
-            responseWindow?: string;
-            recommendedStack?: string[];
-          }
-        | {
-            error: string;
-            fieldErrors?: Record<string, string[] | undefined>;
-          };
-
-      if (!response.ok) {
-        setFieldErrors(
-          "fieldErrors" in payload && payload.fieldErrors
-            ? flattenErrors(payload.fieldErrors)
-            : {},
-        );
-        setSubmitState({
-          status: "error",
-          message: payload.error ?? "Something interrupted the request. Please try again.",
-        });
-        return;
+      if (/intern|hire|role|placement|job/.test(lower)) {
+        items.unshift("Hiring or internship signal detected");
       }
 
-      startTransition(() => {
-        setSubmitState({
-          status: "success",
-          message:
-            "summary" in payload && payload.summary
-              ? payload.summary
-              : "Your request has been sent successfully.",
-          leadId: "leadId" in payload ? payload.leadId : undefined,
-          responseWindow:
-            "responseWindow" in payload ? payload.responseWindow : undefined,
-          recommendedStack:
-            "recommendedStack" in payload ? payload.recommendedStack : undefined,
-        });
-        setForm(defaultForm);
-      });
-    } catch {
-      setSubmitState({
-        status: "error",
-        message: "Network hiccup. Retry once and the request should go through.",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  }
+      if (/mern|react|frontend|ui|website|web app/.test(lower)) {
+        items.unshift("Frontend and MERN alignment rising");
+      }
+
+      if (/node|express|api|backend|mongodb|database/.test(lower)) {
+        items.unshift("Backend systems request recognized");
+      }
+
+      if (/ai|llm|openai|gemini|ollama|copilot|insight/.test(lower)) {
+        items.unshift("AI integration request recognized");
+      }
+
+      if (/socket|realtime|real-time|telemetry|event/.test(lower)) {
+        items.unshift("Realtime systems signal detected");
+      }
+
+      if (/freelance|collab|project|build/.test(lower)) {
+        items.unshift("Project collaboration signal detected");
+      }
+
+      return Array.from(new Set(items)).slice(0, 4);
+    },
+    [messageValue],
+  );
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[1.15fr_0.85fr]">
-      <form onSubmit={handleSubmit} className="space-y-5">
+    <div className="grid gap-6 lg:grid-cols-[1.06fr_0.94fr]">
+      <form action={formAction} className="space-y-5">
         <div className="grid gap-5 md:grid-cols-2">
           <label className="space-y-2">
             <span className="text-sm font-semibold text-white">Name</span>
-            <input
-              value={form.name}
-              onChange={(event) => updateField("name", event.target.value)}
-              className="field-input"
-              placeholder="Your name"
-            />
-            {fieldErrors.name ? (
-              <span className="text-sm text-orange-300">{fieldErrors.name}</span>
-            ) : null}
+            <input name="name" className="field-input" placeholder="Your name" />
+            {formatFieldError(state.fieldErrors?.name)}
           </label>
-
           <label className="space-y-2">
             <span className="text-sm font-semibold text-white">Email</span>
             <input
-              value={form.email}
-              onChange={(event) => updateField("email", event.target.value)}
-              className="field-input"
+              name="email"
               type="email"
+              className="field-input"
               placeholder="name@company.com"
             />
-            {fieldErrors.email ? (
-              <span className="text-sm text-orange-300">{fieldErrors.email}</span>
-            ) : null}
+            {formatFieldError(state.fieldErrors?.email)}
           </label>
         </div>
 
         <div className="grid gap-5 md:grid-cols-3">
           <label className="space-y-2 md:col-span-1">
             <span className="text-sm font-semibold text-white">Organization</span>
-            <input
-              value={form.company}
-              onChange={(event) => updateField("company", event.target.value)}
-              className="field-input"
-              placeholder="Optional"
-            />
-            {fieldErrors.company ? (
-              <span className="text-sm text-orange-300">{fieldErrors.company}</span>
-            ) : null}
+            <input name="organization" className="field-input" placeholder="Optional" />
+            {formatFieldError(state.fieldErrors?.organization)}
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-white">Opportunity Type</span>
-            <select
-              value={form.opportunityType}
-              onChange={(event) =>
-                updateField(
-                  "opportunityType",
-                  event.target.value as (typeof opportunityTypes)[number],
-                )
-              }
-              className="field-select"
-            >
-              {opportunityTypes.map((item) => (
-                <option key={item} value={item}>
-                  {item}
+            <span className="text-sm font-semibold text-white">Message Type</span>
+            <select name="transmissionType" className="field-select" defaultValue={transmissionTypes[0]}>
+              {transmissionTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
                 </option>
               ))}
             </select>
-            {fieldErrors.opportunityType ? (
-              <span className="text-sm text-orange-300">
-                {fieldErrors.opportunityType}
-              </span>
-            ) : null}
+            {formatFieldError(state.fieldErrors?.transmissionType)}
           </label>
 
           <label className="space-y-2">
-            <span className="text-sm font-semibold text-white">Timeline</span>
-            <select
-              value={form.timeline}
-              onChange={(event) =>
-                updateField("timeline", event.target.value as (typeof timelineOptions)[number])
-              }
-              className="field-select"
-            >
-              {timelineOptions.map((item) => (
-                <option key={item} value={item}>
-                  {item}
+            <span className="text-sm font-semibold text-white">Urgency</span>
+            <select name="urgency" className="field-select" defaultValue={urgencyBands[0]}>
+              {urgencyBands.map((band) => (
+                <option key={band} value={band}>
+                  {band}
                 </option>
               ))}
             </select>
-            {fieldErrors.timeline ? (
-              <span className="text-sm text-orange-300">{fieldErrors.timeline}</span>
-            ) : null}
+            {formatFieldError(state.fieldErrors?.urgency)}
           </label>
         </div>
 
         <label className="space-y-2">
-          <span className="text-sm font-semibold text-white">Message</span>
+          <span className="text-sm font-semibold text-white">Project Brief</span>
           <textarea
-            value={form.message}
-            onChange={(event) => updateField("message", event.target.value)}
+            name="message"
             className="field-textarea"
-            placeholder="Tell me about the role, team, sprint, or product idea and what kind of contribution you expect."
+            value={messageDraft}
+            onChange={(event) => setMessageDraft(event.target.value)}
+            placeholder="Describe the internship, product, SaaS build, AI feature, or web project and how Gautam can help."
           />
-          {fieldErrors.message ? (
-            <span className="text-sm text-orange-300">{fieldErrors.message}</span>
-          ) : null}
+          {formatFieldError(state.fieldErrors?.message)}
         </label>
 
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="primary-button w-full disabled:cursor-not-allowed disabled:opacity-70"
-        >
-          {isSubmitting ? (
-            <>
-              <LoaderCircle className="size-4 animate-spin" />
-              Sending Request
-            </>
-          ) : (
-            <>
-              Send Opportunity
-              <ArrowRight className="size-4" />
-            </>
-          )}
-        </button>
+        <SubmitButton />
       </form>
 
       <div className="space-y-5">
         <div className="glass-panel p-6">
+          <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
+            Direct fallback
+          </p>
+          <h3 className="mt-3 font-display text-3xl tracking-[-0.05em] text-white">
+            Email Gautam directly
+          </h3>
+          <p className="mt-4 text-sm leading-7 text-white/65">
+            Live inbox delivery is not configured on this machine yet. For now, the form saves in
+            local simulation mode, but you can directly mail Gautam here.
+          </p>
+          <a
+            href={`mailto:${profile.email}`}
+            className="secondary-button mt-5 min-h-11 px-4 py-2 text-sm"
+          >
+            {profile.email}
+          </a>
+        </div>
+
+        <div className="glass-panel p-6">
           <div className="flex items-center justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                Opportunity signal
+              <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
+                Contact routing
               </p>
-              <h3 className="mt-2 font-display text-3xl tracking-[-0.04em] text-white">
-                {liveSignal.lane}
+              <h3 className="mt-2 font-display text-3xl tracking-[-0.05em] text-white">
+                Message priorities
               </h3>
             </div>
-            <span className="inline-flex rounded-full border border-white/10 bg-white/6 px-4 py-2 text-sm font-semibold text-white">
-              {liveSignal.score}%
+            <span className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-cyan-300/16 bg-cyan-300/8">
+              <Radar className="size-5 text-cyan-200" />
             </span>
           </div>
 
-          <div className="mt-5 signal-bar">
-            <span style={{ width: `${liveSignal.score}%` }} />
-          </div>
-
           <div className="mt-6 space-y-3">
-            {liveSignal.notes.map((note) => (
+            {liveSignals.map((signal) => (
               <div
-                key={note}
-                className="surface-line flex items-start gap-3 rounded-2xl px-4 py-3 text-sm text-white/90"
+                key={signal}
+                className="surface-line flex items-start gap-3 rounded-2xl px-4 py-3 text-sm text-white/72"
               >
-                <Sparkles className="mt-0.5 size-4 shrink-0 text-[var(--accent)]" />
-                <span>{note}</span>
+                <Sparkles className="mt-0.5 size-4 shrink-0 text-fuchsia-300" />
+                <span>{signal}</span>
               </div>
-            ))}
-          </div>
-
-          <div className="mt-6 flex flex-wrap gap-2">
-            {liveSignal.recommendedStack.map((item) => (
-              <span key={item} className="pill-chip text-sm">
-                {item}
-              </span>
             ))}
           </div>
         </div>
 
         <div className="glass-panel p-6">
-          <div className="flex items-center gap-3">
-            <span className="inline-flex rounded-2xl border border-white/10 bg-white/6 p-3">
-              {submitState.status === "success" ? (
-                <ShieldCheck className="size-5 text-[var(--accent)]" />
-              ) : (
-                <Send className="size-5 text-[var(--accent-warm)]" />
-              )}
-            </span>
-            <div>
-              <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                Inbox pipeline
-              </p>
-              <h3 className="mt-1 font-display text-2xl tracking-[-0.04em] text-white">
-                {submitState.status === "success" ? "Message received" : "Ready to connect"}
-              </h3>
-            </div>
-          </div>
+          <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
+            Contact status
+          </p>
+          <h3 className="mt-3 font-display text-3xl tracking-[-0.05em] text-white">
+            {state.status === "success" ? "Message received" : "Awaiting input"}
+          </h3>
+          <p className="mt-4 text-sm leading-7 text-white/65">{state.message}</p>
 
-          <p className="mt-5 text-sm leading-7 text-[var(--muted)]">{submitState.message}</p>
-
-          {submitState.leadId ? (
-            <div className="mt-5 space-y-3">
+          {state.leadId ? (
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
               <div className="surface-line rounded-2xl px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
+                <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
                   Reference ID
                 </p>
-                <p className="mt-2 font-mono text-sm text-white">{submitState.leadId}</p>
+                <p className="mt-2 font-mono text-sm text-white">{state.leadId}</p>
               </div>
-              {submitState.responseWindow ? (
-                <div className="surface-line rounded-2xl px-4 py-3">
-                  <p className="text-xs uppercase tracking-[0.22em] text-[var(--muted)]">
-                    Response window
-                  </p>
-                  <p className="mt-2 text-sm text-white">{submitState.responseWindow}</p>
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-
-          {submitState.recommendedStack?.length ? (
-            <div className="mt-5 flex flex-wrap gap-2">
-              {submitState.recommendedStack.map((item) => (
-                <span key={item} className="pill-chip text-sm">
-                  {item}
-                </span>
-              ))}
+              <div className="surface-line rounded-2xl px-4 py-3">
+                <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
+                  Delivery mode
+                </p>
+                <p className="mt-2 text-sm text-white">
+                  {state.deliveryMode === "resend" ? "Live inbox delivery" : "Simulation mode"}
+                </p>
+              </div>
             </div>
           ) : null}
         </div>

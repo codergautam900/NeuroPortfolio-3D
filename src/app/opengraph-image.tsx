@@ -5,7 +5,7 @@ export const size = {
   height: 630,
 };
 
-export const alt = "Aarav Sharma | CS BTech Portfolio";
+export const alt = "Gautam Sagar | Full Stack Portfolio";
 export const contentType = "image/png";
 
 export default function OpenGraphImage() {
@@ -31,14 +31,14 @@ export default function OpenGraphImage() {
             gap: 12,
             padding: "12px 18px",
             borderRadius: 999,
-            border: "1px solid rgba(148,163,184,0.24)",
-            background: "rgba(10, 18, 36, 0.5)",
+            border: "1px solid rgba(46,231,255,0.2)",
+            background: "rgba(6, 10, 24, 0.54)",
             fontSize: 24,
             letterSpacing: "0.22em",
             textTransform: "uppercase",
           }}
         >
-          AARAV//GRAVITY
+          GAUTAM//PORTFOLIO
         </div>
 
         <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
@@ -52,8 +52,8 @@ export default function OpenGraphImage() {
               fontWeight: 800,
             }}
           >
-            <span>Cinematic interfaces.</span>
-            <span>CS-backed builder energy.</span>
+            <span>Gautam Sagar.</span>
+            <span>Full-stack systems and AI.</span>
           </div>
           <p
             style={{
@@ -64,8 +64,8 @@ export default function OpenGraphImage() {
               lineHeight: 1.4,
             }}
           >
-            BTech CSE portfolio with anti-gravity visuals, full-stack projects, and a
-            student-builder profile that still feels premium.
+            B.Tech CSE portfolio focused on MERN, Next.js, realtime systems, and practical
+            AI-enabled product engineering.
           </p>
         </div>
 
@@ -77,11 +77,11 @@ export default function OpenGraphImage() {
             color: "#f5efe6",
           }}
         >
-          <span>BTech CSE</span>
           <span>Next.js</span>
-          <span>AI Builds</span>
-          <span>R3F</span>
-          <span>Full Stack</span>
+          <span>TypeScript</span>
+          <span>Socket.IO</span>
+          <span>LLM APIs</span>
+          <span>MERN</span>
         </div>
       </div>
     ),

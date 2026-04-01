@@ -19,14 +19,14 @@ export default function Icon() {
           justifyContent: "center",
           borderRadius: "18px",
           background:
-            "radial-gradient(circle at 30% 25%, rgba(125,249,255,0.28), transparent 38%), linear-gradient(160deg, #050816, #0b1530 70%, #171f38)",
-          color: "#f5efe6",
+            "radial-gradient(circle at 30% 25%, rgba(46,231,255,0.34), transparent 38%), radial-gradient(circle at 70% 72%, rgba(255,79,216,0.24), transparent 28%), linear-gradient(160deg, #02030b, #081220 70%, #11142a)",
+          color: "#eff7ff",
           fontSize: 32,
           fontWeight: 800,
           letterSpacing: "-0.08em",
         }}
       >
-        N
+        A
       </div>
     ),
     size,

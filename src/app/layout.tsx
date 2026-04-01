@@ -6,29 +6,33 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000",
   ),
   title: {
-    default: "Aarav Sharma | CS BTech Portfolio",
-    template: "%s | Aarav Sharma",
+    default: "Gautam Sagar | Full Stack Portfolio",
+    template: "%s | Gautam Sagar",
   },
   description:
-    "A premium 3D-first portfolio for a CS BTech student focused on full-stack products, AI experiments, and standout frontend execution.",
+    "Interactive portfolio of Gautam Sagar, a B.Tech CSE student and full stack developer focused on MERN, Next.js, realtime systems, and practical AI-powered products.",
   keywords: [
-    "CS student portfolio",
-    "BTech portfolio",
-    "Next.js student portfolio",
-    "3D portfolio",
-    "full-stack student developer",
+    "Gautam Sagar portfolio",
+    "full stack developer portfolio",
+    "MERN stack portfolio",
+    "Next.js portfolio",
+    "AI integration portfolio",
+    "Socket.IO portfolio",
+    "BTech CSE portfolio",
+    "React Node MongoDB portfolio",
+    "student developer portfolio",
   ],
   openGraph: {
-    title: "Aarav Sharma | CS BTech Portfolio",
+    title: "Gautam Sagar | Full Stack Portfolio",
     description:
-      "CS BTech student portfolio with immersive 3D visuals, strong product thinking, and full-stack project depth.",
+      "B.Tech CSE portfolio with MERN, Next.js, realtime systems, and practical AI-enabled full-stack development.",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Aarav Sharma | CS BTech Portfolio",
+    title: "Gautam Sagar | Full Stack Portfolio",
     description:
-      "CS BTech student portfolio with immersive 3D visuals, strong product thinking, and full-stack project depth.",
+      "B.Tech CSE portfolio with MERN, Next.js, realtime systems, and practical AI-enabled full-stack development.",
   },
 };
 
