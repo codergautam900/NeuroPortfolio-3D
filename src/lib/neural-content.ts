@@ -338,7 +338,7 @@ export const hackathonSpotlight = {
     },
   ],
   gallery: [
-    "/1000100468.jpg.jpeg",
+    "/1000100468.jpeg.jpeg",
     "/1000100591.jpg.jpeg",
     "/1000100576.jpg.jpeg",
     "/1000100578.jpg.jpeg",
