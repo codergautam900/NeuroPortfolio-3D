@@ -338,12 +338,12 @@ export const hackathonSpotlight = {
     },
   ],
   gallery: [
-    "/1000100468.jpeg.jpeg",
-    "/1000100591.jpg.jpeg",
-    "/1000100576.jpg.jpeg",
-    "/1000100578.jpg.jpeg",
-    "/1000099998.jpg.jpeg",
-    "/1000100593.jpg.jpeg",
+    "/hackathon-01.jpg",
+    "/hackathon-02.jpg",
+    "/hackathon-03.jpg",
+    "/hackathon-04.jpg",
+    "/hackathon-05.jpg",
+    "/hackathon-06.jpg",
   ],
 } as const;
 
