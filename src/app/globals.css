@@ -406,6 +406,7 @@ section[id] {
   position: relative;
   overflow: hidden;
   border-radius: 2rem;
+  transform-style: preserve-3d;
 }
 
 .hero-photo-card,
@@ -421,6 +422,21 @@ section[id] {
   box-shadow: var(--shadow-xl);
 }
 
+.surface-card::before,
+.featured-project::before,
+.hero-photo-card::before,
+.hero-scene-shell::before,
+.timeline-card::before,
+.footer-block::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(120deg, transparent 15%, rgba(255, 255, 255, 0.05) 35%, transparent 56%);
+  opacity: 0.5;
+}
+
 .hero-photo-card {
   display: grid;
   gap: 1.25rem;
@@ -434,7 +450,7 @@ section[id] {
   padding: 1rem;
 }
 
-.hero-scene-shell::before {
+.hero-scene-shell::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -579,6 +595,7 @@ section[id] {
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1.2rem;
   background: rgba(15, 23, 42, 0.86);
+  box-shadow: 0 24px 60px rgba(2, 6, 23, 0.34);
 }
 
 .hackathon-shot-overlay {
@@ -590,6 +607,26 @@ section[id] {
 
 .hackathon-gallery-grid {
   display: grid;
+  gap: 1rem;
+}
+
+.hackathon-gallery-shell {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1.35rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 2rem;
+  background:
+    radial-gradient(circle at top left, rgba(125, 211, 252, 0.08), transparent 24%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.92), rgba(8, 16, 31, 0.88));
+  box-shadow: var(--shadow-xl);
+}
+
+.hackathon-gallery-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
   gap: 1rem;
 }
 
@@ -725,6 +762,10 @@ section[id] {
     grid-column: span 2;
     min-height: 320px;
   }
+
+  .hackathon-shot-tall {
+    min-height: 320px;
+  }
 }
 
 @media (min-width: 1100px) {
@@ -771,6 +812,7 @@ section[id] {
   .hero-scene-shell,
   .surface-card,
   .featured-project,
+  .hackathon-gallery-shell,
   .footer-block {
     border-radius: 1.4rem;
   }

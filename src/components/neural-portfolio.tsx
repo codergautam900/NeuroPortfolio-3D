@@ -22,6 +22,7 @@ import { NeuralCursor } from "@/components/neural-cursor";
 import { Reveal } from "@/components/reveal";
 import {
   featuredProjects,
+  hackathonGallery,
   hackathonSpotlight,
   neuralLogs,
   neuralSkills,
@@ -405,7 +406,11 @@ export function NeuralPortfolio() {
           <div className="project-grid">
             {supportingProjects.map((project, index) => (
               <Reveal key={project.slug} delay={index * 0.05}>
-                <article className="surface-card h-full p-6">
+                <motion.article
+                  className="surface-card h-full p-6"
+                  whileHover={{ y: -8, rotateX: 4, rotateY: -4 }}
+                  transition={{ type: "spring", stiffness: 220, damping: 18 }}
+                >
                   <p className="mini-label">{project.category}</p>
                   <h3 className="mt-3 text-2xl font-semibold text-white">{project.name}</h3>
                   <p className="mt-4 text-sm leading-7 text-slate-300">{project.summary}</p>
@@ -436,7 +441,7 @@ export function NeuralPortfolio() {
                       </span>
                     )}
                   </div>
-                </article>
+                </motion.article>
               </Reveal>
             ))}
           </div>
@@ -502,13 +507,15 @@ export function NeuralPortfolio() {
               </div>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {hackathonSpotlight.gallery.slice(0, 2).map((imageSrc, index) => (
-                  <div
-                    key={imageSrc}
+                {hackathonGallery.slice(0, 3).map((image, index) => (
+                  <motion.div
+                    key={image.src}
                     className={`hackathon-shot ${index === 0 ? "sm:col-span-2" : ""}`}
+                    whileHover={{ y: -6, scale: 1.01 }}
+                    transition={{ type: "spring", stiffness: 220, damping: 18 }}
                   >
                     <Image
-                      src={imageSrc}
+                      src={image.src}
                       alt={`Hackathon moment ${index + 1}`}
                       fill
                       sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, 30vw"
@@ -516,10 +523,11 @@ export function NeuralPortfolio() {
                     />
                     <div className="hackathon-shot-overlay">
                       <span className="mini-label text-white/80">
-                        {index === 0 ? "Main showcase" : `Build moment ${index + 1}`}
+                        {image.label}
                       </span>
+                      <p className="mt-2 text-sm text-white/70">{image.tone}</p>
                     </div>
-                  </div>
+                  </motion.div>
                 ))}
               </div>
             </Reveal>
@@ -558,17 +566,34 @@ export function NeuralPortfolio() {
             </Reveal>
           </div>
 
-          <Reveal delay={0.08} className="mt-5">
-            <div className="hackathon-gallery-grid">
-              {hackathonSpotlight.gallery.map((imageSrc, index) => (
-                <div
-                  key={`${imageSrc}-${index}`}
-                  className={`hackathon-shot ${
-                    index === 0 ? "hackathon-shot-wide" : ""
-                  }`}
-                >
+          <Reveal delay={0.08} className="mt-6">
+            <div className="hackathon-gallery-shell">
+              <div className="hackathon-gallery-head">
+                <div>
+                  <p className="mini-label">Full event memory wall</p>
+                  <h3 className="mt-3 text-3xl font-semibold text-white">
+                    Every major photo from the build journey, now part of the portfolio story.
+                  </h3>
+                </div>
+                <p className="max-w-xl text-sm leading-7 text-slate-300">
+                  Recent portfolio guidance favors proof, process, and visible build history over
+                  generic decoration. This gallery turns the hackathon into evidence of momentum,
+                  teamwork, shipping, and presentation.
+                </p>
+              </div>
+
+              <div className="hackathon-gallery-grid">
+                {hackathonGallery.map((image, index) => (
+                  <motion.div
+                    key={`${image.src}-${index}`}
+                    className={`hackathon-shot ${
+                      index === 0 ? "hackathon-shot-wide" : index % 5 === 0 ? "hackathon-shot-tall" : ""
+                    }`}
+                    whileHover={{ y: -8, scale: 1.015 }}
+                    transition={{ type: "spring", stiffness: 220, damping: 18 }}
+                  >
                   <Image
-                    src={imageSrc}
+                    src={image.src}
                     alt={`FOSSHack 2026 gallery image ${index + 1}`}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 33vw"
@@ -576,11 +601,13 @@ export function NeuralPortfolio() {
                   />
                   <div className="hackathon-shot-overlay">
                     <span className="mini-label text-white/80">
-                      {index === 0 ? "Main showcase" : `Hackathon photo ${index + 1}`}
+                      {image.label}
                     </span>
+                    <p className="mt-2 text-sm text-white/70">{image.tone}</p>
                   </div>
-                </div>
-              ))}
+                  </motion.div>
+                ))}
+              </div>
             </div>
           </Reveal>
         </section>

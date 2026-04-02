@@ -344,8 +344,31 @@ export const hackathonSpotlight = {
     "/hackathon-04.jpg",
     "/hackathon-05.jpg",
     "/hackathon-06.jpg",
+    "/hackathon-07.jpg",
+    "/hackathon-08.jpg",
+    "/hackathon-09.jpg",
+    "/hackathon-10.jpg",
+    "/hackathon-11.jpg",
+    "/hackathon-12.jpg",
+    "/hackathon-13.jpg",
   ],
 } as const;
+
+export const hackathonGallery = [
+  { src: "/hackathon-01.jpg", label: "Main showcase", tone: "Mission control reveal" },
+  { src: "/hackathon-02.jpg", label: "Live demo", tone: "Pressure-tested sprint moment" },
+  { src: "/hackathon-03.jpg", label: "Team build", tone: "Realtime collaboration energy" },
+  { src: "/hackathon-04.jpg", label: "Floor moment", tone: "Hackathon atmosphere" },
+  { src: "/hackathon-05.jpg", label: "Product wall", tone: "Pitch-ready visual snapshot" },
+  { src: "/hackathon-06.jpg", label: "Showcase frame", tone: "Flagship project presence" },
+  { src: "/hackathon-07.jpg", label: "Workspace", tone: "Focused execution time" },
+  { src: "/hackathon-08.jpg", label: "Build station", tone: "Shipping under pressure" },
+  { src: "/hackathon-09.jpg", label: "Sprint frame", tone: "Momentum and polish" },
+  { src: "/hackathon-10.jpg", label: "Edited memory", tone: "Storytelling snapshot" },
+  { src: "/hackathon-11.jpg", label: "Event edit", tone: "Visual branding layer" },
+  { src: "/hackathon-12.jpg", label: "Moment capture", tone: "Builder identity" },
+  { src: "/hackathon-13.jpg", label: "WhatsApp memory", tone: "Behind-the-scenes proof" },
+] as const;
 
 export const timelineMilestones = [
   {
