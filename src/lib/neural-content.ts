@@ -343,7 +343,7 @@ export const hackathonSpotlight = {
     "/1000100576.jpg.jpeg",
     "/1000100578.jpg.jpeg",
     "/1000099998.jpg.jpeg",
-    "/1000100592.jpg.jpeg",
+    "/1000100593.jpg.jpeg",
   ],
 } as const;
 
