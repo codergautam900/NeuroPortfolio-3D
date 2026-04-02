@@ -462,6 +462,28 @@ export function NeuralPortfolio() {
                   </div>
                 ))}
               </div>
+
+              <div className="mt-8 grid gap-3 sm:grid-cols-2">
+                {hackathonSpotlight.gallery.slice(0, 4).map((imageSrc, index) => (
+                  <div
+                    key={imageSrc}
+                    className={`hackathon-shot ${index === 0 ? "sm:col-span-2" : ""}`}
+                  >
+                    <Image
+                      src={imageSrc}
+                      alt={`Hackathon moment ${index + 1}`}
+                      fill
+                      sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, 30vw"
+                      className="object-cover"
+                    />
+                    <div className="hackathon-shot-overlay">
+                      <span className="mini-label text-white/80">
+                        {index === 0 ? "Main showcase" : `Build moment ${index + 1}`}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </Reveal>
 
             <Reveal delay={0.05} className="surface-card p-6 md:p-8">
