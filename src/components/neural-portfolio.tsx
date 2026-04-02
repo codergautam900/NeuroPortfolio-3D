@@ -1,62 +1,42 @@
 "use client";
 
-import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
-import gsap from "gsap";
-import Lenis from "lenis";
+import { motion, useScroll, useTransform } from "framer-motion";
 import {
-  ArrowDown,
+  ArrowDownRight,
   ArrowRight,
   BadgeCheck,
-  BrainCircuit,
-  Disc3,
-  PanelsTopLeft,
-  RadioTower,
+  Download,
+  ExternalLink,
+  Mail,
+  MapPin,
+  Menu,
+  Sparkles,
+  X,
 } from "lucide-react";
-import { startTransition, useEffect, useRef, useState } from "react";
-import { AudioToggle } from "@/components/audio-toggle";
+import { startTransition, useEffect, useMemo, useState } from "react";
 import { ContactForm } from "@/components/contact-form";
-import { NeuralCursor } from "@/components/neural-cursor";
-import { NeuralPreloader } from "@/components/neural-preloader";
 import { Reveal } from "@/components/reveal";
 import {
   featuredProjects,
   hackathonSpotlight,
   neuralLogs,
+  neuralSkills,
   profile,
   socialOrbs,
+  timelineMilestones,
 } from "@/lib/neural-content";
 
-const NeuralHeroScene = dynamic(() => import("@/components/neural-hero-scene"), {
-  ssr: false,
-  loading: () => <div className="neural-scene-placeholder" />,
-});
-const AboutHologram = dynamic(() => import("@/components/about-hologram"), {
-  ssr: false,
-  loading: () => <div className="neural-canvas-placeholder h-[520px]" />,
-});
-const SkillsNebula = dynamic(() => import("@/components/skills-nebula"), {
-  ssr: false,
-  loading: () => <div className="neural-canvas-placeholder h-[620px]" />,
-});
-const ProjectsRail = dynamic(() => import("@/components/projects-rail"), {
-  ssr: false,
-  loading: () => <div className="neural-canvas-placeholder h-[420px]" />,
-});
-const OracleConsole = dynamic(() => import("@/components/oracle-console"), {
-  ssr: false,
-  loading: () => <div className="neural-canvas-placeholder h-[420px]" />,
-});
-const JourneyTimeline = dynamic(() => import("@/components/journey-timeline"), {
-  ssr: false,
-  loading: () => <div className="neural-canvas-placeholder h-[520px]" />,
-});
-const NeuralGlobe = dynamic(() => import("@/components/neural-globe"), {
-  ssr: false,
-  loading: () => <div className="neural-canvas-placeholder h-[320px]" />,
-});
+const navItems = [
+  { href: "#about", label: "About" },
+  { href: "#work", label: "Work" },
+  { href: "#skills", label: "Skills" },
+  { href: "#journey", label: "Journey" },
+  { href: "#contact", label: "Contact" },
+] as const;
+
+type SkillItem = (typeof neuralSkills)[number];
 
 function SectionHeading({
   eyebrow,
@@ -68,499 +48,509 @@ function SectionHeading({
   description: string;
 }) {
   return (
-    <Reveal className="mb-10 max-w-3xl space-y-4">
+    <Reveal className="max-w-3xl space-y-4">
       <span className="eyebrow">{eyebrow}</span>
-      <h2 className="font-display text-4xl leading-[0.95] tracking-[-0.06em] text-white md:text-6xl">
-        {title}
-      </h2>
-      <p className="max-w-2xl text-base leading-8 text-white/64 md:text-lg">
-        {description}
-      </p>
+      <h2 className="section-title">{title}</h2>
+      <p className="section-copy">{description}</p>
     </Reveal>
   );
 }
 
+function groupSkills() {
+  const clusters = new Map<string, SkillItem[]>();
+
+  neuralSkills.forEach((skill) => {
+    const existing = clusters.get(skill.cluster) ?? [];
+    clusters.set(skill.cluster, [...existing, skill]);
+  });
+
+  return Array.from(clusters.entries()).map(([cluster, items]) => ({
+    cluster,
+    items: items.slice(0, 4),
+  }));
+}
+
 export function NeuralPortfolio() {
-  const [entered, setEntered] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [tagline, setTagline] = useState<string>(profile.taglineFallback);
-  const [ready, setReady] = useState(false);
-  const aboutRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll();
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
 
   useEffect(() => {
-    const lenis = new Lenis({
-      duration: 1.2,
-      smoothWheel: true,
-      syncTouch: true,
-    });
-
-    function update(time: number) {
-      lenis.raf(time * 1000);
-    }
-
-    gsap.ticker.add(update);
-    gsap.ticker.lagSmoothing(0);
-
-    const readyTimer = window.setTimeout(() => setReady(true), 2400);
-
     startTransition(async () => {
       const response = await fetch("/api/tagline").catch(() => null);
-      if (!response?.ok) {
-        return;
-      }
+      if (!response?.ok) return;
 
       const payload = (await response.json()) as { tagline?: string };
       if (payload.tagline) {
         setTagline(payload.tagline);
       }
     });
-
-    return () => {
-      window.clearTimeout(readyTimer);
-      gsap.ticker.remove(update);
-      lenis.destroy();
-    };
   }, []);
 
-  function enterVoid() {
-    setEntered(true);
-    aboutRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
-  }
+  const skillGroups = useMemo(() => groupSkills(), []);
+  const featuredProject = featuredProjects[0];
+  const supportingProjects = featuredProjects.slice(1);
 
   return (
-    <div className="relative isolate min-h-screen overflow-x-clip bg-background">
-      <NeuralPreloader ready={ready} />
-      <NeuralCursor />
-      <AudioToggle />
+    <div className="portfolio-shell">
+      <motion.div aria-hidden className="progress-line" style={{ width: progressWidth }} />
 
-      <motion.div
-        aria-hidden
-        className="pointer-events-none fixed left-0 top-0 z-[95] h-px bg-[linear-gradient(90deg,#2ee7ff,#ff4fd8,#8b5cff)]"
-        style={{ width: progressWidth }}
-      />
-
-      <div className="pointer-events-none fixed inset-0 z-0 opacity-25 mix-blend-screen">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_18%_18%,rgba(46,231,255,0.16),transparent_18%),radial-gradient(circle_at_82%_20%,rgba(255,79,216,0.16),transparent_18%),radial-gradient(circle_at_50%_90%,rgba(139,92,255,0.2),transparent_22%)]" />
-      </div>
-
-      <header className="sticky top-0 z-[80] border-b border-white/6 bg-[rgba(2,3,11,0.62)] backdrop-blur-2xl">
+      <header className="site-header">
         <div className="section-shell flex items-center justify-between gap-4 py-4">
-          <Link href="#hero" className="font-display text-lg tracking-[0.28em] text-white">
-            GAUTAM//PORTFOLIO
+          <Link href="#top" className="brand-mark">
+            Gautam Sagar
           </Link>
-          <nav className="hidden items-center gap-6 text-sm text-white/55 md:flex">
-            <Link href="#identity">About</Link>
-            <Link href="#cortex">Skills</Link>
-            <Link href="#creations">Projects</Link>
-            <Link href="#hackathon">Hackathon</Link>
-            <Link href="#oracle">Oracle</Link>
-            <Link href="#timeline">Journey</Link>
-            <Link href="#transmission">Contact</Link>
-            <a href={profile.resumeHref} download className="text-white/70 transition hover:text-white">
+
+          <nav className="hidden items-center gap-6 text-sm text-slate-300 lg:flex">
+            {navItems.map((item) => (
+              <Link key={item.href} href={item.href} className="nav-link">
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+
+          <div className="hidden items-center gap-3 lg:flex">
+            <a href={profile.resumeHref} download className="secondary-button px-4 py-2 text-sm">
+              <Download className="size-4" />
               Resume
             </a>
-          </nav>
-          <div className="flex items-center gap-3">
-            <a href={profile.resumeHref} download className="secondary-button min-h-11 px-4 py-2 text-sm">
-              Download Resume
-            </a>
-            <Link href="#transmission" className="secondary-button min-h-11 px-4 py-2 text-sm">
-              Contact
+            <Link href="#contact" className="primary-button px-5 py-2 text-sm">
+              Let&apos;s talk
+              <ArrowRight className="size-4" />
             </Link>
           </div>
+
+          <button
+            type="button"
+            className="menu-button lg:hidden"
+            onClick={() => setMenuOpen((value) => !value)}
+            aria-label="Toggle navigation"
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X className="size-5" /> : <Menu className="size-5" />}
+          </button>
         </div>
+
+        {menuOpen ? (
+          <div className="section-shell pb-4 lg:hidden">
+            <div className="mobile-nav">
+              {navItems.map((item) => (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="mobile-nav-link"
+                  onClick={() => setMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <a
+                href={profile.resumeHref}
+                download
+                className="secondary-button w-full justify-center px-4 py-3 text-sm"
+              >
+                <Download className="size-4" />
+                Download resume
+              </a>
+            </div>
+          </div>
+        ) : null}
       </header>
 
-      <main className="relative z-10">
-        <section id="hero" className="section-shell min-h-screen py-6 md:py-10">
-          <div className="grid gap-8 lg:grid-cols-[0.92fr_1.08fr] lg:items-center">
-            <Reveal className="space-y-8">
-              <span className="eyebrow">
-                {profile.role} / MERN x Next.js / AI x Realtime / B.Tech CSE
-              </span>
+      <main id="top">
+        <section className="section-shell hero-grid">
+          <Reveal className="space-y-8">
+            <span className="eyebrow">{profile.role} / MERN / Next.js / AI Features</span>
 
-              <div className="space-y-6">
-                <h1 className="neural-title max-w-4xl text-white">
-                  Building practical
-                  <br />
-                  full-stack systems that ship.
-                </h1>
-                <p className="max-w-2xl text-lg leading-8 text-white/65 md:text-xl">
-                  {profile.intro}
-                </p>
-                <div className="neural-tagline max-w-xl">
-                  <span className="mr-3 inline-flex h-2 w-2 rounded-full bg-cyan-300 shadow-[0_0_20px_rgba(46,231,255,0.9)]" />
-                  {tagline}
+            <div className="space-y-5">
+              <h1 className="hero-title">
+                Full-stack portfolio with cleaner design, stronger storytelling, and production
+                thinking.
+              </h1>
+              <p className="hero-copy">{profile.intro}</p>
+              <div className="status-strip">
+                <Sparkles className="size-4 text-amber-300" />
+                <span>{tagline}</span>
+              </div>
+            </div>
+
+            <div className="hero-actions">
+              <Link href="#work" className="primary-button">
+                View selected work
+                <ArrowRight className="size-4" />
+              </Link>
+              <a href={profile.resumeHref} download className="secondary-button">
+                <Download className="size-4" />
+                Download resume
+              </a>
+            </div>
+
+            <div className="hero-stats">
+              {profile.stats.map((item) => (
+                <div key={item.label} className="metric-card">
+                  <p className="metric-value">{item.value}</p>
+                  <p className="metric-label">{item.label}</p>
                 </div>
-              </div>
-
-              <div className="flex flex-col gap-4 sm:flex-row">
-                <button type="button" className="primary-button" onClick={enterVoid}>
-                  Explore Portfolio
-                  <ArrowRight className="size-4" />
-                </button>
-                <a href={profile.resumeHref} download className="secondary-button">
-                  Download Resume
-                  <ArrowDown className="size-4" />
-                </a>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-3">
-                {profile.stats.map((item) => (
-                  <div key={item.label} className="neural-metric">
-                    <p className="font-display text-4xl tracking-[-0.06em] text-white">
-                      {item.value}
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-white/55">{item.label}</p>
-                  </div>
-                ))}
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.08}>
-              <div className="hero-stage overflow-hidden">
-                <div className="absolute left-4 right-4 top-4 z-20 flex flex-wrap items-center justify-between gap-3 rounded-full border border-white/10 bg-[rgba(6,12,28,0.46)] px-4 py-3 text-[10px] uppercase tracking-[0.24em] text-white/48 backdrop-blur-xl md:left-6 md:right-6 md:top-6">
-                  <span>{profile.location}</span>
-                  <span>{profile.availability}</span>
-                </div>
-
-                <NeuralHeroScene entered={entered} />
-
-                <div className="absolute bottom-4 left-4 right-4 z-20 grid gap-3 md:bottom-6 md:left-6 md:right-6 md:grid-cols-3">
-                  {[
-                    {
-                      icon: BrainCircuit,
-                      label: "CS foundations",
-                      body: "Java, OOPs, DSA, debugging, and logical thinking anchor how complex features get built.",
-                    },
-                    {
-                      icon: PanelsTopLeft,
-                      label: "Scalable app systems",
-                      body: "MERN and Next.js apps with auth, RBAC, APIs, data modeling, and production-minded structure.",
-                    },
-                    {
-                      icon: Disc3,
-                      label: "Realtime + AI",
-                      body: "Socket.IO, telemetry-style pipelines, and LLM-powered features add practical intelligence to products.",
-                    },
-                  ].map((item) => (
-                    <div key={item.label} className="surface-line rounded-[1.6rem] p-4">
-                      <item.icon className="size-5 text-cyan-300" />
-                      <p className="mt-3 text-xs uppercase tracking-[0.22em] text-white/45">
-                        {item.label}
-                      </p>
-                      <p className="mt-2 text-sm leading-7 text-white/72">{item.body}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        <section className="section-shell pb-8">
-          <Reveal className="flex flex-wrap gap-3">
-            {[
-              "Java + DSA",
-              "React + Redux",
-              "Next.js",
-              "TypeScript",
-              "Node.js",
-              "JWT + RBAC",
-              "Socket.IO",
-              "OpenAI / Gemini",
-              "Python ML",
-              "Vercel + Render",
-            ].map((item) => (
-              <span key={item} className="pill-chip">
-                <BadgeCheck className="size-4 text-cyan-300" />
-                {item}
-              </span>
-            ))}
+              ))}
+            </div>
           </Reveal>
-        </section>
 
-        <section id="identity" ref={aboutRef} className="section-shell py-16 md:py-24">
-          <SectionHeading
-            eyebrow="Professional Profile"
-            title="A full-stack developer building practical products with strong fundamentals and modern system thinking."
-            description="Gautam brings together CS foundations, frontend clarity, backend ownership, and hands-on experience with realtime and AI-enabled workflows to build production-minded web applications."
-          />
-
-          <div className="grid gap-6 lg:grid-cols-[0.98fr_1.02fr]">
-            <Reveal className="glass-panel overflow-hidden p-4 md:p-5">
-              <div className="grid gap-5 lg:grid-cols-[0.78fr_1.22fr]">
-                <div className="relative rounded-[1.9rem] border border-cyan-300/18 bg-[radial-gradient(circle_at_20%_15%,rgba(46,231,255,0.18),transparent_30%),linear-gradient(180deg,rgba(6,12,28,0.92),rgba(3,7,18,0.98))] p-3 shadow-[0_0_80px_rgba(46,231,255,0.08)]">
-                  <div className="relative aspect-[0.72] overflow-hidden rounded-[1.45rem] border border-white/10 bg-black/20">
-                    <Image
-                      src="/profile-student.jpeg"
-                      alt={`${profile.name} portrait`}
-                      fill
-                      sizes="(max-width: 1024px) 100vw, 32vw"
-                      className="object-cover object-[center_18%]"
-                      priority
-                    />
-                    <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_45%,rgba(2,6,18,0.75)_100%)]" />
-                    <div className="absolute left-4 top-4 rounded-full border border-cyan-300/25 bg-[rgba(5,10,24,0.65)] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-cyan-100/70 backdrop-blur-lg">
-                      Gautam // Professional Profile
-                    </div>
-                    <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between gap-3 rounded-[1rem] border border-white/10 bg-[rgba(5,10,24,0.58)] px-4 py-3 backdrop-blur-xl">
-                      <div>
-                        <p className="text-[10px] uppercase tracking-[0.22em] text-cyan-100/55">
-                          Engineering Focus
-                        </p>
-                        <p className="mt-1 text-sm text-white/80">
-                          Product thinking, system design, and reliable execution
-                        </p>
-                      </div>
-                      <span className="inline-flex h-3 w-3 rounded-full bg-cyan-300 shadow-[0_0_18px_rgba(46,231,255,0.85)]" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-4 p-2">
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/55">
-                      Profile Summary
-                    </p>
-                    <h3 className="mt-2 font-display text-4xl tracking-[-0.06em] text-white">
-                      {profile.name}
-                    </h3>
-                  </div>
-                  <p className="text-base leading-8 text-white/68">
-                    Gautam is a B.Tech CSE student and full-stack developer focused on building
-                    dependable web products. His work combines Java, OOP, and problem-solving
-                    fundamentals with MERN, Next.js, TypeScript, API design, authentication,
-                    realtime systems, and practical AI integrations. The goal is simple: create
-                    interfaces that feel polished for users and systems that remain maintainable as
-                    products grow.
+          <Reveal delay={0.08}>
+            <div className="hero-visual">
+              <div className="hero-photo-card">
+                <div className="hero-photo-copy">
+                  <span className="mini-label">Based in {profile.location}</span>
+                  <p className="text-sm leading-7 text-slate-300">
+                    Available for internships, product builds, and freelance collaborations.
                   </p>
+                </div>
 
-                  <div className="grid gap-3 sm:grid-cols-2">
-                    {[
-                      "Strong grounding in Java, OOP, debugging, and DSA",
-                      "Full-stack delivery with MERN and Next.js",
-                      "REST APIs, JWT authentication, and RBAC patterns",
-                      "Realtime, telemetry-style, and AI-assisted features",
-                    ].map((item) => (
-                      <div
-                        key={item}
-                        className="surface-line rounded-2xl px-4 py-3 text-sm text-white/72"
-                      >
-                        {item}
-                      </div>
-                    ))}
+                <div className="hero-photo-frame">
+                  <Image
+                    src="/profile-student.jpeg"
+                    alt={`${profile.name} portrait`}
+                    fill
+                    priority
+                    sizes="(max-width: 1024px) 100vw, 44vw"
+                    className="object-cover object-[center_18%]"
+                  />
+                </div>
+
+                <div className="hero-note-grid">
+                  <div className="info-tile">
+                    <MapPin className="size-4 text-emerald-300" />
+                    <div>
+                      <p className="mini-label">Current focus</p>
+                      <p className="text-sm text-slate-200">
+                        Full-stack apps, API systems, AI features, and recruiter-ready polish.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="info-tile">
+                    <Mail className="size-4 text-sky-300" />
+                    <div>
+                      <p className="mini-label">Reachout</p>
+                      <p className="text-sm text-slate-200">{profile.email}</p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </Reveal>
-
-            <Reveal delay={0.05}>
-              <AboutHologram />
-            </Reveal>
-          </div>
-        </section>
-
-        <section id="cortex" className="section-shell py-16 md:py-24">
-          <SectionHeading
-            eyebrow="Skills Stack"
-            title="A wider technical profile across frontend, backend, AI, realtime, and deployment."
-            description="Hover the nodes to inspect Gautam's current strengths across the stack, from Java and DSA to Next.js, Socket.IO, and LLM integration."
-          />
-          <Reveal>
-            <SkillsNebula />
+            </div>
           </Reveal>
         </section>
 
-        <section id="creations" className="section-shell py-16 md:py-24">
-          <SectionHeading
-            eyebrow="Featured Projects"
-            title="SustainOS AI leads the portfolio, supported by full-stack, realtime, and product-style builds."
-            description="The project rail now puts the hackathon flagship first, with deep links to the live app, APIs, demo, and repository alongside other core projects."
-          />
-          <Reveal>
-            <ProjectsRail />
-          </Reveal>
+        <section className="section-shell logo-strip">
+          {[
+            "Java + OOP",
+            "React + Redux",
+            "Next.js + TypeScript",
+            "Node.js + Express",
+            "MongoDB + APIs",
+            "Socket.IO + Realtime",
+          ].map((item) => (
+            <span key={item} className="cap-chip">
+              <BadgeCheck className="size-4 text-emerald-300" />
+              {item}
+            </span>
+          ))}
         </section>
 
-        <section id="hackathon" className="section-shell py-16 md:py-24">
+        <section id="about" className="section-shell section-stack">
           <SectionHeading
-            eyebrow="Hackathon Flashpoint"
-            title="SustainOS AI was pushed from serious build to showcase project during FOSSHack 2026."
-            description="This section captures the story, links, and visual moments behind the hackathon flagship so the portfolio feels built-in-public instead of just listed on a resume."
+            eyebrow="About"
+            title="Built for recruiters and teams who want signal fast, not noise."
+            description="Recent portfolio reviews consistently emphasize scannability, sharp summaries, and clear case-study outcomes. This version follows that direction with a cleaner visual hierarchy, stronger project framing, and less gimmick-heavy interaction."
           />
 
-          <div className="grid gap-6 lg:grid-cols-[0.86fr_1.14fr]">
-            <Reveal className="space-y-6">
-              <div className="glass-panel p-6 md:p-8">
-                <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/55">
-                  {hackathonSpotlight.event}
-                </p>
-                <h3 className="mt-3 font-display text-4xl tracking-[-0.06em] text-white">
-                  {hackathonSpotlight.title}
-                </h3>
-                <p className="mt-4 text-lg leading-8 text-white/68">
-                  {hackathonSpotlight.subtitle}
-                </p>
-                <p className="mt-5 text-sm leading-8 text-white/64">
-                  {hackathonSpotlight.description}
+          <div className="two-col-panel">
+            <Reveal className="surface-card p-6 md:p-8">
+              <div className="space-y-5">
+                <p className="mini-label">Professional summary</p>
+                <h3 className="card-title">{profile.name}</h3>
+                <p className="section-copy">
+                  I am a B.Tech CSE student and full-stack developer focused on building products
+                  that look polished, stay maintainable, and solve real workflow problems. My work
+                  blends frontend clarity, backend ownership, authentication, APIs, realtime
+                  systems, and practical AI integrations.
                 </p>
 
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  {hackathonSpotlight.highlights.map((item) => (
-                    <div
-                      key={item}
-                      className="surface-line rounded-2xl px-4 py-3 text-sm leading-7 text-white/72"
-                    >
+                <div className="grid gap-3 md:grid-cols-2">
+                  {[
+                    "Strong Java, OOP, debugging, and DSA fundamentals",
+                    "Clean responsive UIs with React, Next.js, and TypeScript",
+                    "Backend ownership with Node.js, Express, MongoDB, auth, and RBAC",
+                    "Product-style features with realtime, AI, and deployment workflows",
+                  ].map((item) => (
+                    <div key={item} className="soft-card text-sm leading-7 text-slate-300">
                       {item}
                     </div>
                   ))}
                 </div>
-
-                <div className="mt-6 grid gap-3 sm:grid-cols-2">
-                  {hackathonSpotlight.stats.map((item) => (
-                    <div key={item.label} className="neural-metric">
-                      <p className="font-display text-3xl tracking-[-0.05em] text-white">
-                        {item.value}
-                      </p>
-                      <p className="mt-2 text-sm leading-6 text-white/58">{item.label}</p>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="mt-6 flex flex-wrap gap-2">
-                  {hackathonSpotlight.tags.map((tag) => (
-                    <span key={tag} className="pill-chip text-sm">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-
-                <div className="mt-6 flex flex-wrap gap-3">
-                  {hackathonSpotlight.links.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="secondary-button min-h-11 px-4 py-2 text-sm"
-                    >
-                      {link.label}
-                      <ArrowRight className="size-4" />
-                    </a>
-                  ))}
-                </div>
               </div>
             </Reveal>
 
-            <Reveal delay={0.05}>
-              <div className="grid gap-4 sm:grid-cols-2">
-                {hackathonSpotlight.gallery.map((imageSrc, index) => (
-                  <div
-                    key={imageSrc}
-                    className={`glass-panel p-2 ${
-                      index === 0 ? "sm:col-span-2" : ""
-                    }`}
-                  >
-                    <div
-                      className={`relative overflow-hidden rounded-[1.5rem] ${
-                        index === 0 ? "aspect-[16/9]" : "aspect-[4/5]"
-                      }`}
-                    >
-                      <Image
-                        src={imageSrc}
-                        alt={`FOSSHack 2026 SustainOS AI moment ${index + 1}`}
-                        fill
-                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                        className="object-cover transition duration-500 hover:scale-[1.03]"
-                      />
-                      <div className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,transparent_35%,rgba(2,6,18,0.7)_100%)]" />
-                      <div className="absolute bottom-3 left-3 rounded-full border border-white/10 bg-[rgba(5,10,24,0.68)] px-3 py-1 text-[10px] uppercase tracking-[0.24em] text-cyan-100/70 backdrop-blur-lg">
-                        {index === 0 ? "Hackathon Showcase" : `Build Moment ${index + 1}`}
-                      </div>
+            <Reveal delay={0.06} className="surface-card p-6 md:p-8">
+              <div className="space-y-5">
+                <p className="mini-label">Why this portfolio works better</p>
+                <div className="space-y-4">
+                  {[
+                    "Hero section now prioritizes your face, role, availability, and strongest value proposition.",
+                    "Projects are framed as outcomes, architecture decisions, and links instead of visual clutter.",
+                    "Mobile navigation, layout stacking, and card spacing are tuned so the site stays strong on smaller screens.",
+                  ].map((item) => (
+                    <div key={item} className="feature-row">
+                      <ArrowDownRight className="mt-1 size-4 shrink-0 text-amber-300" />
+                      <p className="text-sm leading-7 text-slate-300">{item}</p>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             </Reveal>
           </div>
         </section>
 
-        <section id="oracle" className="section-shell py-16 md:py-24">
+        <section id="work" className="section-shell section-stack">
           <SectionHeading
-            eyebrow="Portfolio Oracle"
-            title="Ask about Gautam's technical range, project depth, or internship readiness."
-            description="The oracle now reflects the broader profile: CS fundamentals, MERN and Next.js engineering, realtime systems, deployment, and AI feature work."
+            eyebrow="Selected Work"
+            title="Projects positioned like product case studies, not just screenshots."
+            description="The lead project gets space to explain what it does, why it matters, and how the system is structured. Supporting builds stay easy to scan for hiring managers and collaborators."
           />
-          <Reveal>
-            <OracleConsole />
+
+          <Reveal className="featured-project">
+            <div className="space-y-5">
+              <span className="eyebrow">{featuredProject.year}</span>
+              <div className="space-y-4">
+                <h3 className="card-title">{featuredProject.name}</h3>
+                <p className="text-lg leading-8 text-slate-200">{featuredProject.summary}</p>
+              </div>
+              <div className="grid gap-3 md:grid-cols-2">
+                {featuredProject.highlights.map((item) => (
+                  <div key={item} className="soft-card text-sm leading-7 text-slate-300">
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <div className="flex flex-wrap gap-2">
+                {featuredProject.stack.map((item) => (
+                  <span key={item} className="cap-chip">
+                    {item}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-5">
+              <div className="code-panel">
+                <p className="mini-label">Architecture snapshot</p>
+                <pre className="code-block">
+                  <code>{featuredProject.code}</code>
+                </pre>
+              </div>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {featuredProject.links.slice(0, 4).map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="project-link"
+                  >
+                    <span>{link.label}</span>
+                    <ExternalLink className="size-4" />
+                  </a>
+                ))}
+              </div>
+            </div>
           </Reveal>
-        </section>
 
-        <section id="timeline" className="section-shell py-16 md:py-24">
-          <SectionHeading
-            eyebrow="Education Journey"
-            title="From school foundations to CS core, full-stack systems, AI features, and hackathons."
-            description="This timeline follows Gautam's growth from academics into practical engineering, including Java fundamentals, MERN projects, realtime work, and FOSS Hack 2026 exposure."
-          />
-          <Reveal>
-            <JourneyTimeline />
-          </Reveal>
-        </section>
-
-        <section id="logs" className="section-shell py-16 md:py-24">
-          <SectionHeading
-            eyebrow="Builder Notes"
-            title="Technical thinking shaped by systems work, debugging, and pressure-tested building."
-            description="These notes reflect how Gautam thinks about engineering beyond the UI layer: architecture, realtime behavior, AI features, and problem-solving discipline."
-          />
-
-          <div className="grid gap-5 lg:grid-cols-3">
-            {neuralLogs.map((log, index) => (
-              <Reveal key={log.title} delay={index * 0.05}>
-                <article className="glass-panel h-full p-6">
-                  <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
-                    {log.meta}
-                  </p>
-                  <h3 className="mt-4 font-display text-3xl tracking-[-0.05em] text-white">
-                    {log.title}
-                  </h3>
-                  <p className="mt-4 text-sm leading-7 text-white/65">{log.excerpt}</p>
-                  <pre className="mt-5 overflow-x-auto rounded-[1.2rem] border border-white/8 bg-black/20 p-4 text-xs leading-6 text-white/70">
-                    <code>{`<neural-log type="insight" scene="${index + 1}" />
-const premise = "Ship practical systems with clarity and strong fundamentals.";
-deploy(premise, withProductThinking);`}</code>
-                  </pre>
+          <div className="project-grid">
+            {supportingProjects.map((project, index) => (
+              <Reveal key={project.slug} delay={index * 0.05}>
+                <article className="surface-card h-full p-6">
+                  <p className="mini-label">{project.category}</p>
+                  <h3 className="mt-3 text-2xl font-semibold text-white">{project.name}</h3>
+                  <p className="mt-4 text-sm leading-7 text-slate-300">{project.summary}</p>
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    {project.stack.map((item) => (
+                      <span key={item} className="cap-chip text-sm">
+                        {item}
+                      </span>
+                    ))}
+                  </div>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    {project.links.length ? (
+                      project.links.map((link) => (
+                        <a
+                          key={link.href}
+                          href={link.href}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="secondary-button px-4 py-2 text-sm"
+                        >
+                          {link.label}
+                          <ExternalLink className="size-4" />
+                        </a>
+                      ))
+                    ) : (
+                      <span className="text-sm text-slate-400">
+                        Repository or live link not added yet.
+                      </span>
+                    )}
+                  </div>
                 </article>
               </Reveal>
             ))}
           </div>
         </section>
 
-        <section id="transmission" className="section-shell py-16 md:py-24">
+        <section id="skills" className="section-shell section-stack">
           <SectionHeading
-            eyebrow="Contact Gautam"
-            title="Reach out for internships, full-stack roles, AI-enabled products, or freelance builds."
-            description="This contact layer is aimed at teams or clients who need frontend polish, backend ownership, realtime features, or practical AI integration in web products."
+            eyebrow="Skills"
+            title="Grouped to show range clearly across frontend, backend, realtime, and AI."
+            description="Instead of floating 3D nodes, skills are organized by capability so someone scanning the page quickly understands where your strengths sit."
           />
 
-          <div className="grid gap-6 lg:grid-cols-[0.82fr_1.18fr]">
-            <Reveal className="space-y-6">
-              <NeuralGlobe />
-
-              <div className="glass-panel p-6">
-                <div className="flex items-center gap-3">
-                  <RadioTower className="size-5 text-cyan-300" />
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/55">
-                      Quick links
-                    </p>
-                    <h3 className="mt-1 font-display text-3xl tracking-[-0.05em] text-white">
-                      Connect and explore
-                    </h3>
+          <div className="skill-grid">
+            {skillGroups.map((group, index) => (
+              <Reveal key={group.cluster} delay={index * 0.04}>
+                <div className="surface-card h-full p-6">
+                  <p className="mini-label">{group.cluster}</p>
+                  <div className="mt-5 space-y-4">
+                    {group.items.map((item) => (
+                      <div key={item.name} className="space-y-2">
+                        <div className="flex items-center justify-between gap-3 text-sm text-white">
+                          <span>{item.name}</span>
+                          <span className="text-slate-400">{item.level}%</span>
+                        </div>
+                        <div className="skill-bar">
+                          <span style={{ width: `${item.level}%` }} />
+                        </div>
+                        <p className="text-sm leading-7 text-slate-300">{item.description}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        <section className="section-shell section-stack">
+          <SectionHeading
+            eyebrow="Hackathon Highlight"
+            title="SustainOS AI turned hackathon pressure into a credible flagship build."
+            description="This section keeps the strongest story visible: a month-long build sharpened through a 36-hour sprint, with live links and clear product depth."
+          />
+
+          <div className="two-col-panel">
+            <Reveal className="surface-card p-6 md:p-8">
+              <p className="mini-label">{hackathonSpotlight.event}</p>
+              <h3 className="mt-3 text-3xl font-semibold text-white">{hackathonSpotlight.title}</h3>
+              <p className="mt-4 text-lg leading-8 text-slate-200">
+                {hackathonSpotlight.subtitle}
+              </p>
+              <p className="mt-4 text-sm leading-7 text-slate-300">
+                {hackathonSpotlight.description}
+              </p>
+
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {hackathonSpotlight.stats.map((item) => (
+                  <div key={item.label} className="soft-card">
+                    <p className="metric-value text-3xl">{item.value}</p>
+                    <p className="metric-label">{item.label}</p>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+
+            <Reveal delay={0.05} className="surface-card p-6 md:p-8">
+              <p className="mini-label">Proof points</p>
+              <div className="mt-5 space-y-3">
+                {hackathonSpotlight.highlights.map((item) => (
+                  <div key={item} className="feature-row">
+                    <BadgeCheck className="mt-1 size-4 shrink-0 text-emerald-300" />
+                    <p className="text-sm leading-7 text-slate-300">{item}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-6 flex flex-wrap gap-2">
+                {hackathonSpotlight.tags.map((tag) => (
+                  <span key={tag} className="cap-chip text-sm">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3">
+                {hackathonSpotlight.links.slice(0, 4).map((link) => (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="secondary-button px-4 py-2 text-sm"
+                  >
+                    {link.label}
+                    <ExternalLink className="size-4" />
+                  </a>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section id="journey" className="section-shell section-stack">
+          <SectionHeading
+            eyebrow="Journey"
+            title="The path from CS foundations to shipping full-stack systems."
+            description="This keeps your story chronological and easy to understand, especially for recruiters who want context quickly."
+          />
+
+          <div className="timeline-list">
+            {timelineMilestones.map((item, index) => (
+              <Reveal key={`${item.year}-${item.title}`} delay={index * 0.04}>
+                <article className="timeline-card">
+                  <p className="mini-label">{item.year}</p>
+                  <h3 className="mt-3 text-2xl font-semibold text-white">{item.title}</h3>
+                  <p className="mt-3 text-sm leading-7 text-slate-300">{item.description}</p>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        <section className="section-shell section-stack">
+          <SectionHeading
+            eyebrow="Builder Notes"
+            title="How I think when products need to ship cleanly."
+            description="A short writing layer helps the portfolio feel thoughtful and mature without overwhelming the page."
+          />
+
+          <div className="project-grid">
+            {neuralLogs.map((log, index) => (
+              <Reveal key={log.title} delay={index * 0.05}>
+                <article className="surface-card h-full p-6">
+                  <p className="mini-label">{log.meta}</p>
+                  <h3 className="mt-3 text-2xl font-semibold text-white">{log.title}</h3>
+                  <p className="mt-4 text-sm leading-7 text-slate-300">{log.excerpt}</p>
+                </article>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+
+        <section id="contact" className="section-shell section-stack">
+          <SectionHeading
+            eyebrow="Contact"
+            title="Reach out for internships, freelance builds, or full-stack collaboration."
+            description="The contact area keeps quick links visible while the form stays available for longer project or hiring conversations."
+          />
+
+          <div className="contact-layout">
+            <Reveal className="space-y-5">
+              <div className="surface-card p-6 md:p-8">
+                <p className="mini-label">Quick links</p>
+                <h3 className="mt-3 text-3xl font-semibold text-white">Where to find me</h3>
                 <div className="mt-6 flex flex-wrap gap-3">
                   {socialOrbs.map((orb) => (
                     <a
@@ -568,57 +558,50 @@ deploy(premise, withProductThinking);`}</code>
                       href={orb.href}
                       target="_blank"
                       rel="noreferrer"
-                      className="group inline-flex items-center gap-3 rounded-full border border-white/10 bg-white/5 px-4 py-3 text-sm text-white/68 transition hover:border-cyan-300/28 hover:text-white"
+                      className="project-link"
                     >
-                      <span
-                        className="inline-flex h-3 w-3 rounded-full shadow-[0_0_20px_currentColor]"
-                        style={{ backgroundColor: orb.accent, color: orb.accent }}
-                      />
-                      {orb.label}
+                      <span>{orb.label}</span>
+                      <ExternalLink className="size-4" />
                     </a>
+                  ))}
+                </div>
+              </div>
+
+              <div className="surface-card p-6 md:p-8">
+                <p className="mini-label">Best fit</p>
+                <div className="mt-5 space-y-3">
+                  {[
+                    "Internship roles for full-stack, frontend, or web engineering",
+                    "Freelance product builds with Next.js, APIs, dashboards, or auth flows",
+                    "Realtime and AI-enabled features that need practical execution",
+                  ].map((item) => (
+                    <div key={item} className="feature-row">
+                      <BadgeCheck className="mt-1 size-4 shrink-0 text-emerald-300" />
+                      <p className="text-sm leading-7 text-slate-300">{item}</p>
+                    </div>
                   ))}
                 </div>
               </div>
             </Reveal>
 
-            <Reveal delay={0.04} className="glass-panel p-6 md:p-8">
+            <Reveal delay={0.05} className="surface-card p-6 md:p-8">
               <ContactForm />
             </Reveal>
           </div>
         </section>
       </main>
 
-      <footer className="section-shell pb-10 pt-4">
-        <div className="flex flex-col gap-4 border-t border-white/10 py-6 text-sm text-white/50 md:flex-row md:items-center md:justify-between">
-          <p>
-            Built as Gautam Sagar&apos;s interactive portfolio for recruiters, collaborators, and
-            teams looking for clean systems, thoughtful UI, and practical execution.
-          </p>
-          <div className="flex flex-wrap gap-3">
-            {[
-              `${featuredProjects.length} featured builds`,
-              "FOSSHack 2026 flagship build",
-              "Realtime, auth, AI, and deployment-ready thinking",
-            ].map((item) => (
-              <span key={item} className="pill-chip text-sm">
-                {item}
-              </span>
-            ))}
-          </div>
+      <footer className="section-shell footer-block">
+        <p className="text-sm leading-7 text-slate-400">
+          Built as a cleaner, high-signal portfolio focused on responsiveness, project clarity,
+          and a more premium first impression across desktop and mobile.
+        </p>
+        <div className="flex flex-wrap gap-2">
+          <span className="cap-chip text-sm">Responsive across mobile and desktop</span>
+          <span className="cap-chip text-sm">Recruiter-first structure</span>
+          <span className="cap-chip text-sm">Less gimmick, more signal</span>
         </div>
       </footer>
-
-      <AnimatePresence>
-        {!ready ? null : (
-          <motion.div
-            aria-hidden
-            className="pointer-events-none fixed inset-x-0 bottom-0 z-[40] h-32 bg-[radial-gradient(circle_at_50%_100%,rgba(46,231,255,0.08),transparent_55%)]"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
