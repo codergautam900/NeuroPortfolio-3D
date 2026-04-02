@@ -64,6 +64,18 @@ body::before {
   opacity: 0.6;
 }
 
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.08), transparent 28%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.02), transparent 30%);
+  opacity: 0.6;
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -94,6 +106,48 @@ section[id] {
   isolation: isolate;
   min-height: 100vh;
   padding-bottom: 3rem;
+}
+
+.ambient-mesh {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.ambient-orb {
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(56px);
+  opacity: 0.28;
+  animation: drift 18s ease-in-out infinite;
+}
+
+.ambient-orb-a {
+  top: 6%;
+  left: -4%;
+  width: 18rem;
+  height: 18rem;
+  background: rgba(125, 211, 252, 0.34);
+}
+
+.ambient-orb-b {
+  top: 22%;
+  right: -2%;
+  width: 22rem;
+  height: 22rem;
+  background: rgba(251, 191, 36, 0.2);
+  animation-delay: -6s;
+}
+
+.ambient-orb-c {
+  bottom: 8%;
+  left: 24%;
+  width: 20rem;
+  height: 20rem;
+  background: rgba(52, 211, 153, 0.18);
+  animation-delay: -11s;
 }
 
 .progress-line {
@@ -339,7 +393,13 @@ section[id] {
   align-items: stretch;
 }
 
+.hero-visual-stack {
+  display: grid;
+  gap: 1.2rem;
+}
+
 .hero-photo-card,
+.hero-scene-shell,
 .surface-card,
 .featured-project,
 .timeline-card {
@@ -349,6 +409,7 @@ section[id] {
 }
 
 .hero-photo-card,
+.hero-scene-shell,
 .surface-card,
 .featured-project,
 .timeline-card,
@@ -365,6 +426,52 @@ section[id] {
   gap: 1.25rem;
   width: 100%;
   padding: 1.25rem;
+}
+
+.hero-scene-shell {
+  position: relative;
+  overflow: hidden;
+  padding: 1rem;
+}
+
+.hero-scene-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top left, rgba(125, 211, 252, 0.14), transparent 24%),
+    radial-gradient(circle at bottom right, rgba(244, 114, 182, 0.12), transparent 20%);
+  pointer-events: none;
+}
+
+.hero-scene-copy,
+.hero-scene-badges {
+  position: relative;
+  z-index: 1;
+}
+
+.hero-scene-copy {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.4rem 0.35rem 1rem;
+}
+
+.hero-scene-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  padding: 0.8rem 0.35rem 0.3rem;
+}
+
+.hero-scene-fallback {
+  min-height: 720px;
+  border-radius: 1.6rem;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(125, 211, 252, 0.24), transparent 18%),
+    radial-gradient(circle at 72% 42%, rgba(244, 114, 182, 0.18), transparent 16%),
+    linear-gradient(180deg, rgba(15, 23, 42, 0.96), rgba(8, 16, 31, 0.98));
 }
 
 .hero-photo-copy {
@@ -481,6 +588,11 @@ section[id] {
   background: linear-gradient(180deg, transparent, rgba(8, 16, 31, 0.82));
 }
 
+.hackathon-gallery-grid {
+  display: grid;
+  gap: 1rem;
+}
+
 .project-link {
   display: flex;
   align-items: center;
@@ -559,6 +671,17 @@ section[id] {
   box-shadow: 0 0 0 4px rgba(125, 211, 252, 0.08);
 }
 
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+
+  50% {
+    transform: translate3d(0, -24px, 0) scale(1.06);
+  }
+}
+
 @media (min-width: 900px) {
   .hero-grid,
   .two-col-panel,
@@ -577,6 +700,11 @@ section[id] {
     min-height: calc(100vh - 5.5rem);
   }
 
+  .hero-visual-stack {
+    grid-template-columns: minmax(0, 1.18fr) minmax(290px, 0.82fr);
+    align-items: stretch;
+  }
+
   .hero-note-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -587,6 +715,15 @@ section[id] {
 
   .hackathon-shot:first-child {
     min-height: 280px;
+  }
+
+  .hackathon-gallery-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .hackathon-shot-wide {
+    grid-column: span 2;
+    min-height: 320px;
   }
 }
 
@@ -613,6 +750,10 @@ section[id] {
   .hero-photo-frame {
     min-height: 360px;
   }
+
+  .hero-scene-fallback {
+    min-height: 460px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -627,6 +768,7 @@ section[id] {
   }
 
   .hero-photo-card,
+  .hero-scene-shell,
   .surface-card,
   .featured-project,
   .footer-block {
@@ -635,6 +777,11 @@ section[id] {
 
   .hero-photo-frame {
     min-height: 320px;
+    border-radius: 1.15rem;
+  }
+
+  .hero-scene-fallback {
+    min-height: 360px;
     border-radius: 1.15rem;
   }
 

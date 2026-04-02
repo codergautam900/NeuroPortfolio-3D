@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -17,6 +18,7 @@ import {
 } from "lucide-react";
 import { startTransition, useEffect, useMemo, useState } from "react";
 import { ContactForm } from "@/components/contact-form";
+import { NeuralCursor } from "@/components/neural-cursor";
 import { Reveal } from "@/components/reveal";
 import {
   featuredProjects,
@@ -27,6 +29,11 @@ import {
   socialOrbs,
   timelineMilestones,
 } from "@/lib/neural-content";
+
+const NeuralHeroScene = dynamic(() => import("@/components/neural-hero-scene"), {
+  ssr: false,
+  loading: () => <div className="hero-scene-fallback" />,
+});
 
 const navItems = [
   { href: "#about", label: "About" },
@@ -75,6 +82,8 @@ export function NeuralPortfolio() {
   const [tagline, setTagline] = useState<string>(profile.taglineFallback);
   const { scrollYProgress } = useScroll();
   const progressWidth = useTransform(scrollYProgress, [0, 1], ["0%", "100%"]);
+  const heroCopyY = useTransform(scrollYProgress, [0, 0.2], [0, -40]);
+  const heroVisualY = useTransform(scrollYProgress, [0, 0.2], [0, 34]);
 
   useEffect(() => {
     startTransition(async () => {
@@ -94,7 +103,13 @@ export function NeuralPortfolio() {
 
   return (
     <div className="portfolio-shell">
+      <NeuralCursor />
       <motion.div aria-hidden className="progress-line" style={{ width: progressWidth }} />
+      <div className="ambient-mesh">
+        <div className="ambient-orb ambient-orb-a" />
+        <div className="ambient-orb ambient-orb-b" />
+        <div className="ambient-orb ambient-orb-c" />
+      </div>
 
       <header className="site-header">
         <div className="section-shell flex items-center justify-between gap-4 py-4">
@@ -160,84 +175,107 @@ export function NeuralPortfolio() {
 
       <main id="top">
         <section className="section-shell hero-grid">
-          <Reveal className="space-y-8">
-            <span className="eyebrow">{profile.role} / MERN / Next.js / AI Features</span>
+          <motion.div style={{ y: heroCopyY }}>
+            <Reveal className="space-y-8">
+              <span className="eyebrow">{profile.role} / MERN / Next.js / AI Features</span>
 
-            <div className="space-y-5">
-              <h1 className="hero-title">
-                Full-stack portfolio with cleaner design, stronger storytelling, and production
-                thinking.
-              </h1>
-              <p className="hero-copy">{profile.intro}</p>
-              <div className="status-strip">
-                <Sparkles className="size-4 text-amber-300" />
-                <span>{tagline}</span>
-              </div>
-            </div>
-
-            <div className="hero-actions">
-              <Link href="#work" className="primary-button">
-                View selected work
-                <ArrowRight className="size-4" />
-              </Link>
-              <a href={profile.resumeHref} download className="secondary-button">
-                <Download className="size-4" />
-                Download resume
-              </a>
-            </div>
-
-            <div className="hero-stats">
-              {profile.stats.map((item) => (
-                <div key={item.label} className="metric-card">
-                  <p className="metric-value">{item.value}</p>
-                  <p className="metric-label">{item.label}</p>
-                </div>
-              ))}
-            </div>
-          </Reveal>
-
-          <Reveal delay={0.08}>
-            <div className="hero-visual">
-              <div className="hero-photo-card">
-                <div className="hero-photo-copy">
-                  <span className="mini-label">Based in {profile.location}</span>
-                  <p className="text-sm leading-7 text-slate-300">
-                    Available for internships, product builds, and freelance collaborations.
-                  </p>
-                </div>
-
-                <div className="hero-photo-frame">
-                  <Image
-                    src="/profile-student.jpeg"
-                    alt={`${profile.name} portrait`}
-                    fill
-                    priority
-                    sizes="(max-width: 1024px) 100vw, 44vw"
-                    className="object-cover object-[center_18%]"
-                  />
-                </div>
-
-                <div className="hero-note-grid">
-                  <div className="info-tile">
-                    <MapPin className="size-4 text-emerald-300" />
-                    <div>
-                      <p className="mini-label">Current focus</p>
-                      <p className="text-sm text-slate-200">
-                        Full-stack apps, API systems, AI features, and recruiter-ready polish.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="info-tile">
-                    <Mail className="size-4 text-sky-300" />
-                    <div>
-                      <p className="mini-label">Reachout</p>
-                      <p className="text-sm text-slate-200">{profile.email}</p>
-                    </div>
-                  </div>
+              <div className="space-y-5">
+                <h1 className="hero-title">
+                  Shipping high-end web products with premium UI, modern motion, and solid
+                  full-stack engineering.
+                </h1>
+                <p className="hero-copy">{profile.intro}</p>
+                <div className="status-strip">
+                  <Sparkles className="size-4 text-amber-300" />
+                  <span>{tagline}</span>
                 </div>
               </div>
-            </div>
-          </Reveal>
+
+              <div className="hero-actions">
+                <Link href="#work" className="primary-button">
+                  View selected work
+                  <ArrowRight className="size-4" />
+                </Link>
+                <a href={profile.resumeHref} download className="secondary-button">
+                  <Download className="size-4" />
+                  Download resume
+                </a>
+              </div>
+
+              <div className="hero-stats">
+                {profile.stats.map((item) => (
+                  <div key={item.label} className="metric-card">
+                    <p className="metric-value">{item.value}</p>
+                    <p className="metric-label">{item.label}</p>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          </motion.div>
+
+          <motion.div style={{ y: heroVisualY }}>
+            <Reveal delay={0.08}>
+              <div className="hero-visual-stack">
+                <div className="hero-scene-shell">
+                  <div className="hero-scene-copy">
+                    <span className="mini-label">Interactive depth layer</span>
+                    <p className="text-sm leading-7 text-slate-300">
+                      Controlled 3D energy added back with a cleaner premium presentation.
+                    </p>
+                  </div>
+                  <NeuralHeroScene entered />
+                  <div className="hero-scene-badges">
+                    {["Motion-first UI", "Depth without clutter", "Recruiter-friendly clarity"].map(
+                      (item) => (
+                        <span key={item} className="cap-chip text-sm">
+                          {item}
+                        </span>
+                      ),
+                    )}
+                  </div>
+                </div>
+
+                <div className="hero-photo-card">
+                  <div className="hero-photo-copy">
+                    <span className="mini-label">Based in {profile.location}</span>
+                    <p className="text-sm leading-7 text-slate-300">
+                      Available for internships, product builds, and freelance collaborations.
+                    </p>
+                  </div>
+
+                  <div className="hero-photo-frame">
+                    <Image
+                      src="/profile-student.jpeg"
+                      alt={`${profile.name} portrait`}
+                      fill
+                      priority
+                      sizes="(max-width: 1024px) 100vw, 44vw"
+                      className="object-cover object-[center_18%]"
+                    />
+                  </div>
+
+                  <div className="hero-note-grid">
+                    <div className="info-tile">
+                      <MapPin className="size-4 text-emerald-300" />
+                      <div>
+                        <p className="mini-label">Current focus</p>
+                        <p className="text-sm text-slate-200">
+                          Full-stack apps, API systems, AI features, and recruiter-ready polish.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="info-tile">
+                      <Mail className="size-4 text-sky-300" />
+                      <div>
+                        <p className="mini-label">Reachout</p>
+                        <p className="text-sm text-slate-200">{profile.email}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Reveal>
+          </motion.div>
         </section>
 
         <section className="section-shell logo-strip">
@@ -464,7 +502,7 @@ export function NeuralPortfolio() {
               </div>
 
               <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {hackathonSpotlight.gallery.slice(0, 4).map((imageSrc, index) => (
+                {hackathonSpotlight.gallery.slice(0, 2).map((imageSrc, index) => (
                   <div
                     key={imageSrc}
                     className={`hackathon-shot ${index === 0 ? "sm:col-span-2" : ""}`}
@@ -519,6 +557,32 @@ export function NeuralPortfolio() {
               </div>
             </Reveal>
           </div>
+
+          <Reveal delay={0.08} className="mt-5">
+            <div className="hackathon-gallery-grid">
+              {hackathonSpotlight.gallery.map((imageSrc, index) => (
+                <div
+                  key={`${imageSrc}-${index}`}
+                  className={`hackathon-shot ${
+                    index === 0 ? "hackathon-shot-wide" : ""
+                  }`}
+                >
+                  <Image
+                    src={imageSrc}
+                    alt={`FOSSHack 2026 gallery image ${index + 1}`}
+                    fill
+                    sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 33vw"
+                    className="object-cover"
+                  />
+                  <div className="hackathon-shot-overlay">
+                    <span className="mini-label text-white/80">
+                      {index === 0 ? "Main showcase" : `Hackathon photo ${index + 1}`}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Reveal>
         </section>
 
         <section id="journey" className="section-shell section-stack">
