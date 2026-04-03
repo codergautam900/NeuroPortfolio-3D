@@ -1,18 +1,18 @@
 export const profile = {
   name: "Gautam Sagar",
-  role: "Full Stack Developer",
+  role: "B.Tech CSE | Full Stack Developer",
   location: "India / IST",
   availability: "Open for internships, product roles, and freelance collaborations",
   email: "gateaspirant@gmail.com",
   resumeHref: "/Gautam-sagar-Resume.pdf",
   intro:
-    "I build end-to-end web products across MERN and Next.js, combining strong frontend engineering with scalable backend systems, real-time features, and practical AI integrations. My focus is shipping usable products with clean UI, solid APIs, auth, data modeling, and production-minded structure.",
+    "I am a B.Tech CSE student and full stack developer who builds end-to-end products across MERN, Next.js, Flutter, Python, and AI/ML workflows. My focus is combining strong CS fundamentals, polished UI, scalable backend systems, realtime behavior, and practical AI integrations to ship products that feel modern and reliable.",
   taglineFallback:
-    "Shipping full-stack web systems with clean UI, realtime thinking, and practical AI-powered features.",
+    "Building full-stack, Flutter, and AI-powered products with strong CS fundamentals and modern execution.",
   stats: [
     { value: "1 Month", label: "SustainOS AI build cycle" },
     { value: "36h", label: "FOSSHack sprint push" },
-    { value: "AI + ML", label: "flagship system core" },
+    { value: "Flutter + AI/ML", label: "expanding multi-stack profile" },
   ],
 } as const;
 
@@ -58,6 +58,13 @@ export const neuralSkills = [
     description:
       "Full-stack applications using Next.js and TypeScript with a stronger focus on structure, safety, and production flow.",
     cluster: "Full Stack",
+  },
+  {
+    name: "Flutter",
+    level: 74,
+    description:
+      "Cross-platform app development with modern UI thinking, reusable components, and mobile-first product experimentation.",
+    cluster: "Mobile Development",
   },
   {
     name: "Responsive UI",
@@ -113,6 +120,13 @@ export const neuralSkills = [
     level: 72,
     description:
       "Python-based ML microservices, practical forecasting, and anomaly detection-oriented backend support.",
+    cluster: "AI / ML",
+  },
+  {
+    name: "AI + ML Concepts",
+    level: 75,
+    description:
+      "Applied understanding of AI and ML workflows, model-backed product features, experimentation, and practical problem-solving.",
     cluster: "AI / ML",
   },
   {

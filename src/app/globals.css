@@ -590,12 +590,20 @@ section[id] {
 
 .hackathon-shot {
   position: relative;
-  min-height: 220px;
+  min-height: 280px;
   overflow: hidden;
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 1.2rem;
-  background: rgba(15, 23, 42, 0.86);
+  background:
+    radial-gradient(circle at top, rgba(125, 211, 252, 0.08), transparent 24%),
+    rgba(4, 10, 24, 0.98);
   box-shadow: 0 24px 60px rgba(2, 6, 23, 0.34);
+}
+
+.hackathon-shot-image {
+  object-fit: contain;
+  padding: 0.5rem;
+  background: rgba(4, 10, 24, 0.98);
 }
 
 .hackathon-shot-overlay {
@@ -751,7 +759,7 @@ section[id] {
   }
 
   .hackathon-shot:first-child {
-    min-height: 280px;
+    min-height: 320px;
   }
 
   .hackathon-gallery-grid {
@@ -760,11 +768,11 @@ section[id] {
 
   .hackathon-shot-wide {
     grid-column: span 2;
-    min-height: 320px;
+    min-height: 420px;
   }
 
   .hackathon-shot-tall {
-    min-height: 320px;
+    min-height: 420px;
   }
 }
 
@@ -835,5 +843,9 @@ section[id] {
   .soft-card,
   .status-strip {
     border-radius: 1rem;
+  }
+
+  .hackathon-shot {
+    min-height: 240px;
   }
 }

@@ -178,7 +178,7 @@ export function NeuralPortfolio() {
         <section className="section-shell hero-grid">
           <motion.div style={{ y: heroCopyY }}>
             <Reveal className="space-y-8">
-              <span className="eyebrow">{profile.role} / MERN / Next.js / AI Features</span>
+              <span className="eyebrow">{profile.role} / MERN / Flutter / Python / AI-ML</span>
 
               <div className="space-y-5">
                 <h1 className="hero-title">
@@ -284,8 +284,10 @@ export function NeuralPortfolio() {
             "Java + OOP",
             "React + Redux",
             "Next.js + TypeScript",
+            "Flutter",
             "Node.js + Express",
             "MongoDB + APIs",
+            "Python + AI/ML",
             "Socket.IO + Realtime",
           ].map((item) => (
             <span key={item} className="cap-chip">
@@ -298,8 +300,8 @@ export function NeuralPortfolio() {
         <section id="about" className="section-shell section-stack">
           <SectionHeading
             eyebrow="About"
-            title="Built for recruiters and teams who want signal fast, not noise."
-            description="Recent portfolio reviews consistently emphasize scannability, sharp summaries, and clear case-study outcomes. This version follows that direction with a cleaner visual hierarchy, stronger project framing, and less gimmick-heavy interaction."
+            title="B.Tech CSE student, full-stack developer, and builder across web, mobile, Python, and AI-powered products."
+            description="This section now gives a fuller picture of Gautam's profile: CS fundamentals, web engineering, mobile app development with Flutter, Python-based problem solving, and practical AI/ML-backed product building."
           />
 
           <div className="two-col-panel">
@@ -308,18 +310,24 @@ export function NeuralPortfolio() {
                 <p className="mini-label">Professional summary</p>
                 <h3 className="card-title">{profile.name}</h3>
                 <p className="section-copy">
-                  I am a B.Tech CSE student and full-stack developer focused on building products
-                  that look polished, stay maintainable, and solve real workflow problems. My work
-                  blends frontend clarity, backend ownership, authentication, APIs, realtime
-                  systems, and practical AI integrations.
+                  I am a B.Tech Computer Science and Engineering student with a growing profile
+                  across full-stack web development, Flutter app development, Python, and AI/ML.
+                  I enjoy building products that are technically strong and visually polished,
+                  whether that means a responsive frontend, a scalable backend, a mobile app
+                  workflow, or an AI-powered feature that solves a real problem. My foundation in
+                  Java, OOP, debugging, and DSA helps me approach software with structure, while
+                  MERN, Next.js, Socket.IO, Python, and practical AI integrations let me ship
+                  modern product experiences.
                 </p>
 
                 <div className="grid gap-3 md:grid-cols-2">
                   {[
-                    "Strong Java, OOP, debugging, and DSA fundamentals",
-                    "Clean responsive UIs with React, Next.js, and TypeScript",
-                    "Backend ownership with Node.js, Express, MongoDB, auth, and RBAC",
-                    "Product-style features with realtime, AI, and deployment workflows",
+                    "B.Tech CSE background with strong Java, OOP, debugging, and DSA fundamentals",
+                    "Full-stack web development with MERN, Next.js, React, and TypeScript",
+                    "Backend ownership with Node.js, Express, MongoDB, APIs, auth, and RBAC",
+                    "Flutter-based mobile app development with modern UI thinking",
+                    "Python and AI/ML workflows for practical product intelligence",
+                    "Realtime systems, deployment, and problem-solving focused execution",
                   ].map((item) => (
                     <div key={item} className="soft-card text-sm leading-7 text-slate-300">
                       {item}
@@ -331,12 +339,14 @@ export function NeuralPortfolio() {
 
             <Reveal delay={0.06} className="surface-card p-6 md:p-8">
               <div className="space-y-5">
-                <p className="mini-label">Why this portfolio works better</p>
+                <p className="mini-label">Profile focus</p>
                 <div className="space-y-4">
                   {[
-                    "Hero section now prioritizes your face, role, availability, and strongest value proposition.",
-                    "Projects are framed as outcomes, architecture decisions, and links instead of visual clutter.",
-                    "Mobile navigation, layout stacking, and card spacing are tuned so the site stays strong on smaller screens.",
+                    "Web engineering across React, Next.js, Node.js, Express, MongoDB, and production-style APIs.",
+                    "Mobile development direction through Flutter for cross-platform product building.",
+                    "Python plus AI/ML exploration for model-backed features, automation, and practical intelligence.",
+                    "Strong academic and CS base from B.Tech CSE, helping with logic, debugging, and system thinking.",
+                    "A builder mindset focused on shipping polished UI, solid architecture, and real-world usability.",
                   ].map((item) => (
                     <div key={item} className="feature-row">
                       <ArrowDownRight className="mt-1 size-4 shrink-0 text-amber-300" />
@@ -505,31 +515,6 @@ export function NeuralPortfolio() {
                   </div>
                 ))}
               </div>
-
-              <div className="mt-8 grid gap-3 sm:grid-cols-2">
-                {hackathonGallery.slice(0, 3).map((image, index) => (
-                  <motion.div
-                    key={image.src}
-                    className={`hackathon-shot ${index === 0 ? "sm:col-span-2" : ""}`}
-                    whileHover={{ y: -6, scale: 1.01 }}
-                    transition={{ type: "spring", stiffness: 220, damping: 18 }}
-                  >
-                    <Image
-                      src={image.src}
-                      alt={`Hackathon moment ${index + 1}`}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 900px) 50vw, 30vw"
-                      className="object-cover"
-                    />
-                    <div className="hackathon-shot-overlay">
-                      <span className="mini-label text-white/80">
-                        {image.label}
-                      </span>
-                      <p className="mt-2 text-sm text-white/70">{image.tone}</p>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
             </Reveal>
 
             <Reveal delay={0.05} className="surface-card p-6 md:p-8">
@@ -597,7 +582,7 @@ export function NeuralPortfolio() {
                     alt={`FOSSHack 2026 gallery image ${index + 1}`}
                     fill
                     sizes="(max-width: 640px) 100vw, (max-width: 1100px) 50vw, 33vw"
-                    className="object-cover"
+                    className="hackathon-shot-image"
                   />
                   <div className="hackathon-shot-overlay">
                     <span className="mini-label text-white/80">
